@@ -12,9 +12,15 @@ import {
   TopNavigation 
 } from '@cloudscape-design/components';
 import "./globals.css";
+import React from 'react';
+import { LoginModal } from './common_components/login_modal';
 
 export default function Home() {
   const [searchValue, setSearchValue] = useState("");
+
+  const [isLoginVisible, setLoginVisible] = React.useState(false);
+
+  const [userText, setUserText] = React.useState("");
 
   return (
     <main>
@@ -26,8 +32,18 @@ export default function Home() {
           }}
           utilities={[
             {
-              type: "button",
+              type: "menu-dropdown",
               iconName: "user-profile",
+              text: userText,
+              items: [
+                { itemType: "action", text: "Login", id: "login"},
+                { itemType: "action", text: "Sign Up", id: "sign_up"}
+              ],
+              onItemClick: ({detail}) => {
+                if (detail.id == "login") {
+                  setLoginVisible(true);
+                }
+              }
             },
           ]}
         />
@@ -48,6 +64,8 @@ export default function Home() {
             ]}
           />}
           content={
+            <div>
+            <LoginModal visible={isLoginVisible} setVisible={setLoginVisible} setUserText={setUserText}/>
             <ContentLayout
               defaultPadding
               headerVariant="high-contrast"
@@ -72,6 +90,7 @@ export default function Home() {
                 />
               </SpaceBetween>
             </ContentLayout>
+            </div>
           }
         />
       </div>
