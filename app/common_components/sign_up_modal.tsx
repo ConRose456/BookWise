@@ -43,7 +43,6 @@ export const SignUpModal = (
                                         password,
                                         first_name: firstName,
                                         second_name: secondName,
-                                        is_admin: false
                                     }),
                                 })
                                     .then(response => response.json())

@@ -33,7 +33,7 @@ def sign_up():
         first_name=data["first_name"], 
         second_name=data["second_name"],
         password=data["password"],
-        is_admin=data["is_admin"]
+        is_admin=False
     )
     session.add(new_user)
     session.commit()

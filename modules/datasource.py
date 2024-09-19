@@ -6,7 +6,7 @@ import os
 Base = declarative_base()
 
 rented_books_table = Table('rented_books', Base.metadata,
-    Column('user_username', Integer, ForeignKey('users.username')),
+    Column('user_username', String, ForeignKey('users.username')),
     Column('book_id', Integer, ForeignKey('books.id'))
 )
 
@@ -45,7 +45,7 @@ class OwnedBook(Base):
     
     id = Column(Integer, primary_key=True)
     book_id = Column(Integer, ForeignKey('books.id'))
-    user_id = Column(Integer, ForeignKey('users.username'))
+    user_id = Column(String, ForeignKey('users.username'))
     
     user = relationship('User', back_populates='owned_books')
     book = relationship('Book')
@@ -55,13 +55,14 @@ class Collection(Base):
     
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    user_id = Column(Integer, ForeignKey('users.username'))
+    user_id = Column(String, ForeignKey('users.username'))
     
     user = relationship('User', back_populates='collections')
     books = relationship('Book', secondary=collection_books_table, back_populates='collections')
 
 def initDatasource():
-    engine = create_engine(f'sqlite:////tmp/bookwise.db')
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    engine = create_engine(DATABASE_URL)
     Base.metadata.create_all(engine)
 
     Session = sessionmaker(bind=engine)
