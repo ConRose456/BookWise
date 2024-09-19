@@ -1,21 +1,30 @@
-import datetime
 from flask import Flask, request, jsonify
 from functools import wraps
 
+import datetime
 import modules.datasource as datasource
 import jwt
 import json
-
 import sqlalchemy as db
+import bcrypt
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'your_secret_key'
 
+def hash_password(password):
+    password_bytes = password.encode('utf-8')
+    return bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+
+def check_hashed_password(stored_hash_hex, password):
+    password_bytes = password.encode('utf-8')
+    stored_hash_bytes = bytes.fromhex(stored_hash_hex.replace("\\x", ""))
+    return bcrypt.checkpw(password_bytes, stored_hash_bytes)
+
 def login_user(username, password, session):
     user = session.query(datasource.User).filter_by(username=username).first()
 
-    if (user and user.password == password):
+    if (user and check_hashed_password(user.password, password)):
         payload = {
             "user_username": user.username,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
@@ -28,11 +37,12 @@ def login_user(username, password, session):
 def sign_up():
     session = datasource.initDatasource()
     data = request.json
+
     new_user = datasource.User(
         username=data["username"], 
         first_name=data["first_name"], 
         second_name=data["second_name"],
-        password=data["password"],
+        password=hash_password(data["password"]),
         is_admin=False
     )
     session.add(new_user)
