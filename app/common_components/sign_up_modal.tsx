@@ -1,15 +1,17 @@
-import { Box, Button, FormField, Header, Input, Link, Modal, SpaceBetween } from "@cloudscape-design/components";
+import { Box, Button, FormField, Header, Input, Link, Modal, Popover, SpaceBetween } from "@cloudscape-design/components";
 import { useState } from "react";
 
 
 export const SignUpModal = (
     { 
         visible, 
-        setVisible, 
-        setUserText 
+        setVisible,
+        setLoginVisible,
+        setUserText
     }: { 
         visible: boolean, 
         setVisible: (value: boolean) => any,
+        setLoginVisible: (value: boolean) => any,
         setUserText: (value: string) => any 
     }
 ) => {
@@ -57,7 +59,19 @@ export const SignUpModal = (
                     </SpaceBetween>
                 </Box>
             }
-            header={<Header info={<Link onFollow={() => setVisible(false)}>Login</Link>}>Sign Up</Header>}
+            header={
+                <Header 
+                    info={
+                        <Popover 
+                            header="Sign Up" 
+                            content="You can sing up and create an account here."
+                        >
+                            <Link>info</Link>
+                        </Popover>
+                    }
+                >
+                    Sign Up
+                </Header>}
         >
             <SpaceBetween direction="vertical" size="m">
 
@@ -91,6 +105,23 @@ export const SignUpModal = (
                 >
                     <Input value={confirmPassword} onChange={({ detail }) => setConfirmPassword(detail.value)} placeholder="confirm password" />
                 </FormField>
+                <FormField
+                    description={
+                        <div>
+                          If you have already made an account login here: {" "}
+                          <Link
+                            variant="primary"
+                            fontSize="body-s"
+                            onFollow={() => {
+                                setLoginVisible(true)
+                                setVisible(false)
+                            }}
+                          >
+                            Login
+                          </Link>
+                        </div>
+                    }
+                />
             </SpaceBetween>
         </Modal>
     );

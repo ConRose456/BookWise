@@ -69,8 +69,18 @@ export default function Home() {
           />}
           content={
             <div>
-            <LoginModal visible={isLoginVisible} setVisible={setLoginVisible} setUserText={setUserText}/>
-            <SignUpModal visible={isSignUpVisible} setVisible={setSignUpVisible} setUserText={setUserText}/>
+            <LoginModal 
+              visible={isLoginVisible} 
+              setVisible={setLoginVisible} 
+              setSignUpVisible={setSignUpVisible}
+              setUserText={setUserText}
+            />
+            <SignUpModal 
+              visible={isSignUpVisible} 
+              setVisible={setSignUpVisible} 
+              setLoginVisible={setLoginVisible}
+              setUserText={setUserText}
+            />
             <ContentLayout
               defaultPadding
               headerVariant="high-contrast"
