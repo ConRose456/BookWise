@@ -10,10 +10,9 @@ import sqlalchemy as db
 
 app = Flask(__name__)
 
-session = datasource.initDatasource()
 app.config['SECRET_KEY'] = 'your_secret_key'
 
-def login_user(username, password):
+def login_user(username, password, session):
     user = session.query(datasource.User).filter_by(username=username).first()
 
     if (user and user.password == password):
@@ -27,6 +26,7 @@ def login_user(username, password):
 
 @app.route("/api/sign_up", methods=["POST"])
 def sign_up():
+    session = datasource.initDatasource()
     data = request.json
     new_user = datasource.User(
         username=data["username"], 
@@ -38,8 +38,13 @@ def sign_up():
     session.add(new_user)
     session.commit()
 
-    return login_user(data["username"], data["password"])
+    result = login_user(data["username"], data["password"], session)
+    session.close()
+    return result
 
 @app.route("/api/login", methods=['POST'])
 def login():
-    return login_user(request.json["username"], request.json["password"])
+    session = datasource.initDatasource()
+    result = login_user(request.json["username"], request.json["password"], session)
+    session.close()
+    return result

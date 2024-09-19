@@ -60,21 +60,10 @@ class Collection(Base):
     user = relationship('User', back_populates='collections')
     books = relationship('Book', secondary=collection_books_table, back_populates='collections')
 
+DATABASE_URL = os.getenv('DATABASE_URL')
+engine = create_engine(DATABASE_URL)
+Base.metadata.create_all(engine)
+
 def initDatasource():
-    DATABASE_URL = os.getenv('DATABASE_URL')
-    engine = create_engine(DATABASE_URL)
-    Base.metadata.create_all(engine)
-
     Session = sessionmaker(bind=engine)
-    session = Session()
-
-    admin_user = User(
-        username="admin", 
-        first_name="admin", 
-        second_name="admin",
-        password="admin1",
-        is_admin=True
-    )
-    session.add(admin_user)
-    session.commit()
-    return session
+    return Session()
