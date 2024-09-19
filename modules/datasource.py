@@ -65,11 +65,11 @@ def initDatasource():
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
     
-    database_path = f'sqlite:///{directory_path}/bookwise.db'
+    database_path = f'{directory_path}/bookwise.db'
 
     os.chmod(database_path, 0o664)
 
-    engine = create_engine(database_path)
+    engine = create_engine(f'sqlite:///{database_path}')
     Base.metadata.create_all(engine)
 
     Session = sessionmaker(bind=engine)
