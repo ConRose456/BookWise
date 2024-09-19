@@ -23,12 +23,11 @@ def login_user(username, password):
         }
         token = jwt.encode(payload, key=app.config['SECRET_KEY'], algorithm='HS256')
         return jsonify({'username': user.username,'token': json.dumps(token)})
-    return jsonify({})
+    return jsonify({'error': 'login failed'})
 
 @app.route("/api/sign_up", methods=["POST"])
 def sign_up():
     data = request.json
-    print(data)
     new_user = datasource.User(
         username=data["username"], 
         first_name=data["first_name"], 

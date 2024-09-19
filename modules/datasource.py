@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Table, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+import os
 
 Base = declarative_base()
 
@@ -60,7 +61,11 @@ class Collection(Base):
     books = relationship('Book', secondary=collection_books_table, back_populates='collections')
 
 def initDatasource():
-    engine = create_engine('sqlite:///bookwise.db')
+    directory_path = "database"
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+
+    engine = create_engine(f'sqlite:///{directory_path}/bookwise.db')
     Base.metadata.create_all(engine)
 
     Session = sessionmaker(bind=engine)
