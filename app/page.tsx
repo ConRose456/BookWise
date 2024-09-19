@@ -14,11 +14,13 @@ import {
 import "./globals.css";
 import React from 'react';
 import { LoginModal } from './common_components/login_modal';
+import { SignUpModal } from './common_components/sign_up_modal';
 
 export default function Home() {
   const [searchValue, setSearchValue] = useState("");
 
   const [isLoginVisible, setLoginVisible] = React.useState(false);
+  const [isSignUpVisible, setSignUpVisible] = React.useState(false);
 
   const [userText, setUserText] = React.useState("");
 
@@ -42,6 +44,8 @@ export default function Home() {
               onItemClick: ({detail}) => {
                 if (detail.id == "login") {
                   setLoginVisible(true);
+                } else if (detail.id == "sign_up") {
+                  setSignUpVisible(true);
                 }
               }
             },
@@ -66,6 +70,7 @@ export default function Home() {
           content={
             <div>
             <LoginModal visible={isLoginVisible} setVisible={setLoginVisible} setUserText={setUserText}/>
+            <SignUpModal visible={isSignUpVisible} setVisible={setSignUpVisible} setUserText={setUserText}/>
             <ContentLayout
               defaultPadding
               headerVariant="high-contrast"
