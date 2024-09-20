@@ -35,7 +35,8 @@ export class AuthTokenStateController {
         const token = this.getAuthToken();
 
         if (token) {
-            return jwtDecode(token)?.["user_username"] ?? "";
+            const decodedToken: any = jwtDecode(token);
+            return decodedToken?.user_username ?? "";
         }
         return "";  
     }
