@@ -1,6 +1,8 @@
 import { Box, Button, FormField, Header, Input, Link, Modal, Popover, SpaceBetween } from "@cloudscape-design/components";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { submitSignUpForm } from "../helpers/signUpForm";
+import { AuthTokenStateContext } from "../page";
+import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 
 
 export const SignUpModal = (
@@ -16,6 +18,9 @@ export const SignUpModal = (
         setUserText: (value: string) => any 
     }
 ) => {
+
+    const { authTokenStateController } = useContext(AuthTokenStateContext);
+
     const [loading, setLoading] = useState(false);
 
     const [enteredUsername, setEnteredUsername] = useState("");
@@ -78,7 +83,11 @@ export const SignUpModal = (
                                     setInvalidInputs
                                 );
 
-                                if (signUp.completed) {
+                                authTokenStateController.setIsAuthorised(
+                                    AuthTokenStateController.isAuthorized()
+                                );
+
+                                if (signUp.completed && authTokenStateController.isAuthorized) {
                                     resetModal();
                                 }
                                 setLoading(false);

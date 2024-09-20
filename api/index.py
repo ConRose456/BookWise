@@ -7,10 +7,11 @@ import jwt
 import json
 import sqlalchemy as db
 import bcrypt
+import os
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'your_secret_key'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 def hash_password(password):
     password_bytes = password.encode('utf-8')
@@ -29,7 +30,7 @@ def login_user(username, password, session):
             "user_username": user.username,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }
-        token = jwt.encode(payload, key=app.config['SECRET_KEY'], algorithm='HS256')
+        token = jwt.encode(payload, key=SECRET_KEY, algorithm='HS256')
         return jsonify({'userText': user.username,'token': json.dumps(token)})
     
     return jsonify({'userText': "", 'token': "", 'errors': 'login_failed'})

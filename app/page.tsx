@@ -1,20 +1,31 @@
 "use client";
 
 import { useState } from 'react';
-import { 
-  AppLayout, 
-  ContentLayout, 
-  Header, 
-  Input, 
-  Link, 
-  SideNavigation, 
+import {
+  AppLayout,
+  ContentLayout,
+  Header,
+  Input,
+  Link,
+  SideNavigation,
   SpaceBetween,
-  TopNavigation 
+  TopNavigation
 } from '@cloudscape-design/components';
 import "./globals.css";
 import React from 'react';
 import { LoginModal } from './common_components/login_modal';
 import { SignUpModal } from './common_components/sign_up_modal';
+import { AuthTokenStateController } from './controllers/AuthTokenStateController';
+import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
+
+if (typeof window === "undefined") React.useLayoutEffect = () => { };
+
+export const AuthTokenStateContext = React.createContext(
+  {
+    userDisplayTextUseState: {} as any,
+    authTokenStateController: {} as any
+  }
+);
 
 export default function Home() {
   const [searchValue, setSearchValue] = useState("");
@@ -22,11 +33,35 @@ export default function Home() {
   const [isLoginVisible, setLoginVisible] = React.useState(false);
   const [isSignUpVisible, setSignUpVisible] = React.useState(false);
 
-  const [userText, setUserText] = React.useState("");
+  const [userDisplayText, setUserDisplayText] = React.useState("");
+  const [isAuthorized, setIsAuthorised] = React.useState(false);
+
+
+  const getLoginUtilsItems = (): InternalItemOrGroup[] => {
+    if (isAuthorized) {
+      return [
+        { itemType: "action", text: "Sign Out", id: "sign_out" },
+      ];
+    }
+    return [
+      { itemType: "action", text: "Login", id: "login" },
+      { itemType: "action", text: "Sign Up", id: "sign_up" }
+    ];
+  }
 
   return (
     <main>
       <div>
+        <AuthTokenStateContext.Provider value={{
+          userDisplayTextUseState: {
+            userDisplayText,
+            setUserDisplayText
+          },
+          authTokenStateController: {
+            isAuthorized,
+            setIsAuthorised
+          }
+        }}>
         <TopNavigation
           identity={{
             href: "#",
@@ -36,16 +71,17 @@ export default function Home() {
             {
               type: "menu-dropdown",
               iconName: "user-profile",
-              text: userText,
-              items: [
-                { itemType: "action", text: "Login", id: "login"},
-                { itemType: "action", text: "Sign Up", id: "sign_up"}
-              ],
-              onItemClick: ({detail}) => {
+              text: userDisplayText,
+              items: getLoginUtilsItems(),
+              onItemClick: ({ detail }) => {
                 if (detail.id == "login") {
                   setLoginVisible(true);
                 } else if (detail.id == "sign_up") {
                   setSignUpVisible(true);
+                } else if (detail.id == "sign_out") {
+                  setUserDisplayText("");
+                  AuthTokenStateController.deleteAuthToken();
+                  setIsAuthorised(false);
                 }
               }
             },
@@ -69,45 +105,46 @@ export default function Home() {
           />}
           content={
             <div>
-            <LoginModal 
-              visible={isLoginVisible} 
-              setVisible={setLoginVisible} 
-              setSignUpVisible={setSignUpVisible}
-              setUserText={setUserText}
-            />
-            <SignUpModal 
-              visible={isSignUpVisible} 
-              setVisible={setSignUpVisible} 
-              setLoginVisible={setLoginVisible}
-              setUserText={setUserText}
-            />
-            <ContentLayout
-              defaultPadding
-              headerVariant="high-contrast"
-              header={
-                <Header
-                  className='header'
-                  variant="h1"
-                  info={<Link variant="info">Info</Link>}
-                  description="Search for your favirate books!"
-                >
-                  Book Library
-                </Header>
-              }
-            >
-              <SpaceBetween direction='vertical' size='l'>
-                <Input
-                  onChange={({ detail }) => setSearchValue(detail.value)}
-                  value={searchValue}
-                  placeholder="Search"
-                  type="search"
-                  className='container'
-                />
-              </SpaceBetween>
-            </ContentLayout>
+              <LoginModal
+                visible={isLoginVisible}
+                setVisible={setLoginVisible}
+                setSignUpVisible={setSignUpVisible}
+                setUserText={setUserDisplayText}
+              />
+              <SignUpModal
+                visible={isSignUpVisible}
+                setVisible={setSignUpVisible}
+                setLoginVisible={setLoginVisible}
+                setUserText={setUserDisplayText}
+              />
+              <ContentLayout
+                defaultPadding
+                headerVariant="high-contrast"
+                header={
+                  <Header
+                    className='header'
+                    variant="h1"
+                    info={<Link variant="info">Info</Link>}
+                    description="Search for your favirate books!"
+                  >
+                    Book Library
+                  </Header>
+                }
+              >
+                <SpaceBetween direction='vertical' size='l'>
+                  <Input
+                    onChange={({ detail }) => setSearchValue(detail.value)}
+                    value={searchValue}
+                    placeholder="Search"
+                    type="search"
+                    className='container'
+                  />
+                </SpaceBetween>
+              </ContentLayout>
             </div>
           }
         />
+        </AuthTokenStateContext.Provider>
       </div>
     </main>
   )

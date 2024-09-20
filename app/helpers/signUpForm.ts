@@ -1,3 +1,5 @@
+import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
+
 export const submitSignUpForm = async (
     {firstName, secondName, username, password, confirmPassword }
     : {firstName: string, secondName: string, username: string, password: string, confirmPassword: string},
@@ -47,7 +49,7 @@ export const submitSignUpForm = async (
             .catch((error) => console.log(error));
         
         if (!errors) {
-            sessionStorage.setItem("JWT Token", token);
+            AuthTokenStateController.setAuthToken(token);
             setUserText(userText);
             setVisible(false);
             return { completed: true };
