@@ -26,9 +26,18 @@ export class AuthTokenStateController {
             if (decodedToken.exp) {
                 return decodedToken.exp < (Math.floor(Date.now()) / 1000);
             }
-            return false;
+            return true;
         }
-        return false;   
+        return true;   
+    }
+
+    public static getUserDisplayText = () => {
+        const token = this.getAuthToken();
+
+        if (token) {
+            return jwtDecode(token)?.user_username ?? "";
+        }
+        return "";  
     }
 
     public static getAuthToken = () => 

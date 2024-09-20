@@ -17,6 +17,7 @@ import { LoginModal } from './common_components/login_modal';
 import { SignUpModal } from './common_components/sign_up_modal';
 import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
+import { useEffect } from 'react';
 
 if (typeof window === "undefined") React.useLayoutEffect = () => { };
 
@@ -29,7 +30,13 @@ export default function Home() {
   const [userDisplayText, setUserDisplayText] = React.useState("");
   const [isAuthorized, setIsAuthorised] = React.useState(false);
 
-
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsAuthorised(AuthTokenStateController.isAuthorized());
+      setUserDisplayText(AuthTokenStateController.getUserDisplayText());
+    }
+  }, []);
+  
   const getLoginUtilsItems = (): InternalItemOrGroup[] => {
     if (isAuthorized) {
       return [
