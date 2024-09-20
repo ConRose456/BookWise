@@ -1,4 +1,12 @@
 import { jwtDecode } from 'jwt-decode';
+import React from 'react';
+
+export const AuthTokenStateContext = React.createContext(
+    {
+      userDisplayTextUseState: {} as any,
+      authTokenStateController: {} as any
+    }
+);
 
 export class AuthTokenStateController {
     public static readonly STORAGE_ID = "bw-jwt-auth-token";

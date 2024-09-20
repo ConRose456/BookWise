@@ -15,17 +15,10 @@ import "./globals.css";
 import React from 'react';
 import { LoginModal } from './common_components/login_modal';
 import { SignUpModal } from './common_components/sign_up_modal';
-import { AuthTokenStateController } from './controllers/AuthTokenStateController';
+import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
 
 if (typeof window === "undefined") React.useLayoutEffect = () => { };
-
-export const AuthTokenStateContext = React.createContext(
-  {
-    userDisplayTextUseState: {} as any,
-    authTokenStateController: {} as any
-  }
-);
 
 export default function Home() {
   const [searchValue, setSearchValue] = useState("");
