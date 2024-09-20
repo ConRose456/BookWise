@@ -1,5 +1,6 @@
 import { Box, Button, FormField, Header, Input, Link, Modal, Popover, SpaceBetween } from "@cloudscape-design/components";
 import React, { useState } from "react"
+import { submitLoginForm } from "../helpers/loginForm";
 
 export const LoginModal = (
     { 
@@ -15,29 +16,40 @@ export const LoginModal = (
     }
 ) => {
     const [enteredUsername, setEnteredUsername] = useState("");
-    const [enderedPassword, setEnteredPassword] = useState("");
+    const [enteredPassword, setEnteredPassword] = useState("");
+
+    const [invalidInputs, setInvalidInputs] = useState(false);
+
+    const resetModal = () => {
+        setEnteredUsername("");
+        setEnteredPassword("");
+        setInvalidInputs(false);
+    }
 
     return (
         <Modal
-            onDismiss={() => setVisible(false)}
+            onDismiss={() => { 
+                setVisible(false) 
+                resetModal() 
+            }}
             visible={visible}
             footer={
                 <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
                         <Button variant="link" onClick={() => setVisible(false)}>Cancel</Button>
                         <Button variant="primary" onClick={async () => {
-                            const { username, token } = await fetch("/api/login", {
-                                method: 'POST',
-                                headers: {
-                                    "Content-Type": 'application/json',
-                                    "charset": 'UTF-8'
+                            const login = await submitLoginForm(
+                                {
+                                    username: enteredUsername,
+                                    password: enteredPassword
                                 },
-                                body: JSON.stringify({ username: enteredUsername, password: enderedPassword }),
-                            })
-                            .then(response => response.json());
-                            sessionStorage.setItem("JWT Token", token);
-                            setUserText(username);
-                            setVisible(false);
+                                setUserText,
+                                setVisible,
+                                setInvalidInputs
+                            );
+                            if (login.completed) {
+                                resetModal();
+                            }
                         }}>Login</Button>
                     </SpaceBetween>
                 </Box>
@@ -62,13 +74,14 @@ export const LoginModal = (
                     label="Username"
                     description="The username you created your account with."
                 >
-                    <Input value={enteredUsername} onChange={({ detail }) => setEnteredUsername(detail.value)} placeholder="username" />
+                    <Input value={enteredUsername} invalid={invalidInputs} onChange={({ detail }) => setEnteredUsername(detail.value)} placeholder="username" />
                 </FormField>
                 <FormField
                     label="Password"
                     description="Enter your password."
+                    errorText={invalidInputs ? "Incorrect Username or Password." : ""}
                 >
-                    <Input value={enderedPassword} onChange={({ detail }) => setEnteredPassword(detail.value)} placeholder="password" />
+                    <Input type="password" value={enteredPassword} onChange={({ detail }) => setEnteredPassword(detail.value)} placeholder="password" />
                 </FormField>
                 <FormField
                     description={
@@ -78,8 +91,9 @@ export const LoginModal = (
                             variant="primary"
                             fontSize="body-s"
                             onFollow={() => {
-                                setSignUpVisible(true)
-                                setVisible(false)
+                                setSignUpVisible(true);
+                                setVisible(false);
+                                resetModal();
                             }}
                           >
                             Sign Up

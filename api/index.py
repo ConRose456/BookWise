@@ -30,8 +30,9 @@ def login_user(username, password, session):
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }
         token = jwt.encode(payload, key=app.config['SECRET_KEY'], algorithm='HS256')
-        return jsonify({'username': user.username,'token': json.dumps(token)})
-    return jsonify({'error': 'login failed'})
+        return jsonify({'userText': user.username,'token': json.dumps(token)})
+    
+    return jsonify({'userText': "", 'token': "", 'errors': 'login_failed'})
 
 @app.route("/api/sign_up", methods=["POST"])
 def sign_up():
