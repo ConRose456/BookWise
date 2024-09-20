@@ -3,18 +3,20 @@ import React, { useState } from "react"
 import { submitLoginForm } from "../helpers/loginForm";
 
 export const LoginModal = (
-    { 
-        visible, 
-        setVisible, 
+    {
+        visible,
+        setVisible,
         setSignUpVisible,
-        setUserText 
-    }: { 
-        visible: boolean, 
+        setUserText
+    }: {
+        visible: boolean,
         setVisible: (value: boolean) => any,
-        setSignUpVisible: (value: boolean) => any, 
-        setUserText: (value: string) => any 
+        setSignUpVisible: (value: boolean) => any,
+        setUserText: (value: string) => any
     }
 ) => {
+    const [loading, setLoading] = useState(false);
+
     const [enteredUsername, setEnteredUsername] = useState("");
     const [enteredPassword, setEnteredPassword] = useState("");
 
@@ -24,41 +26,50 @@ export const LoginModal = (
         setEnteredUsername("");
         setEnteredPassword("");
         setInvalidInputs(false);
+        setLoading(false);
     }
 
     return (
         <Modal
-            onDismiss={() => { 
-                setVisible(false) 
-                resetModal() 
+            onDismiss={() => {
+                if (!loading) {
+                    setVisible(false)
+                    resetModal()
+                }
             }}
             visible={visible}
             footer={
                 <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
-                        <Button variant="link" onClick={() => setVisible(false)}>Cancel</Button>
-                        <Button variant="primary" onClick={async () => {
-                            const login = await submitLoginForm(
-                                {
-                                    username: enteredUsername,
-                                    password: enteredPassword
-                                },
-                                setUserText,
-                                setVisible,
-                                setInvalidInputs
-                            );
-                            if (login.completed) {
-                                resetModal();
-                            }
-                        }}>Login</Button>
+                        <Button variant="link" disabled={loading} onClick={() => setVisible(false)}>Cancel</Button>
+                        <Button
+                            variant="primary"
+                            loading={loading}
+                            disabled={loading}
+                            onClick={async () => {
+                                setLoading(true);
+                                const login = await submitLoginForm(
+                                    {
+                                        username: enteredUsername,
+                                        password: enteredPassword
+                                    },
+                                    setUserText,
+                                    setVisible,
+                                    setInvalidInputs
+                                );
+                                if (login.completed) {
+                                    resetModal();
+                                }
+                                setLoading(false);
+                            }}>Login</Button>
                     </SpaceBetween>
                 </Box>
             }
             header={
-                <Header 
+                <Header
                     info={
-                        <Popover 
-                            header="Login" 
+                        <Popover
+                            header="Login"
                             content="You can login to your account here."
                         >
                             <Link>info</Link>
@@ -86,18 +97,20 @@ export const LoginModal = (
                 <FormField
                     description={
                         <div>
-                          If you don't have an account create on here: {" "}
-                          <Link
-                            variant="primary"
-                            fontSize="body-s"
-                            onFollow={() => {
-                                setSignUpVisible(true);
-                                setVisible(false);
-                                resetModal();
-                            }}
-                          >
-                            Sign Up
-                          </Link>
+                            If you don't have an account create on here: {" "}
+                            <Link
+                                variant="primary"
+                                fontSize="body-s"
+                                onFollow={() => {
+                                    if (!loading) {
+                                        setSignUpVisible(true);
+                                        setVisible(false);
+                                        resetModal();
+                                    }
+                                }}
+                            >
+                                Sign Up
+                            </Link>
                         </div>
                     }
                 />

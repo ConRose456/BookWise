@@ -16,6 +16,8 @@ export const SignUpModal = (
         setUserText: (value: string) => any 
     }
 ) => {
+    const [loading, setLoading] = useState(false);
+
     const [enteredUsername, setEnteredUsername] = useState("");
 
     const [password, setPassword] = useState("");
@@ -42,21 +44,27 @@ export const SignUpModal = (
         setPassword("");
         setConfirmPassword("");
         setInvalidInputs([]);
+        setLoading(false);
     }
     return (
         <Modal
             onDismiss={() => {
-                setVisible(false);
-                resetModal();
+                if (!loading) {
+                    setVisible(false);
+                    resetModal();
+                }
             }}
             visible={visible}
             footer={
                 <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
-                        <Button variant="link" onClick={() => setVisible(false)}>Cancel</Button>
+                        <Button variant="link" disabled={loading} onClick={() => setVisible(false)}>Cancel</Button>
                         <Button
                             variant="primary"
+                            loading={loading}
+                            disabled={loading}
                             onClick={async () => {
+                                setLoading(true);
                                 const signUp = await submitSignUpForm(
                                     {
                                         firstName: firstName,
@@ -73,6 +81,7 @@ export const SignUpModal = (
                                 if (signUp.completed) {
                                     resetModal();
                                 }
+                                setLoading(false);
                             }}
                         >
                             Sign Up
@@ -138,9 +147,11 @@ export const SignUpModal = (
                             variant="primary"
                             fontSize="body-s"
                             onFollow={() => {
-                                setLoginVisible(true);
-                                setVisible(false);
-                                resetModal();
+                                if (!loading) {
+                                    setLoginVisible(true);
+                                    setVisible(false);
+                                    resetModal();
+                                }
                             }}
                           >
                             Login
