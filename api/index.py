@@ -34,6 +34,17 @@ def login_user(username, password, session):
     
     return jsonify({'userText': "", 'token': "", 'errors': 'login_failed'})
 
+@app.route("/api/check_username_exists", methods=["POST"])
+def check_username_exists():
+    session = datasource.initDatasource()
+    user = session.query(datasource.User).filter_by(username=request.json["username"]).first()
+    session.close()
+
+    if (user):
+        return jsonify({'exists': True})
+    return jsonify({'exists': False})
+
+
 @app.route("/api/sign_up", methods=["POST"])
 def sign_up():
     session = datasource.initDatasource()

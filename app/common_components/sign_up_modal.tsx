@@ -1,5 +1,6 @@
 import { Box, Button, FormField, Header, Input, Link, Modal, Popover, SpaceBetween } from "@cloudscape-design/components";
 import { useState } from "react";
+import { submitSignUpForm } from "../helpers/signUpForm";
 
 
 export const SignUpModal = (
@@ -23,9 +24,31 @@ export const SignUpModal = (
     const [firstName, setFirstName] = useState("");
     const [secondName, setSecondName] = useState("");
 
+    const [invalidInputs, setInvalidInputs] = useState<string[]>();
+
+    const getUsernameErrorText = () => {
+        if (invalidInputs?.includes("username")) {
+            return "Your username must meet the conditions bellow.";
+        } else if (invalidInputs?.includes("username_exists")) {
+            return "This username already exists";
+        }
+        return "";
+    }
+
+    const resetModal = () => {
+        setFirstName("");
+        setSecondName("");
+        setEnteredUsername("");
+        setPassword("");
+        setConfirmPassword("");
+        setInvalidInputs([]);
+    }
     return (
         <Modal
-            onDismiss={() => setVisible(false)}
+            onDismiss={() => {
+                setVisible(false);
+                resetModal();
+            }}
             visible={visible}
             footer={
                 <Box float="right">
@@ -34,24 +57,22 @@ export const SignUpModal = (
                         <Button
                             variant="primary"
                             onClick={async () => {
-                                const { username, token } = await fetch("/api/sign_up", {
-                                    method: 'POST',
-                                    headers: {
-                                        "Content-Type": 'application/json',
-                                        "charset": 'UTF-8'
-                                    },
-                                    body: JSON.stringify({
+                                const signUp = await submitSignUpForm(
+                                    {
+                                        firstName: firstName,
+                                        secondName: secondName,
                                         username: enteredUsername,
-                                        password,
-                                        first_name: firstName,
-                                        second_name: secondName,
-                                    }),
-                                })
-                                    .then(response => response.json())
-                                    .catch((error) => console.log(error));
-                                sessionStorage.setItem("JWT Token", token);
-                                setUserText(username);
-                                setVisible(false);
+                                        password: password,
+                                        confirmPassword: confirmPassword
+                                    },
+                                    setUserText,
+                                    setVisible,
+                                    setInvalidInputs
+                                );
+
+                                if (signUp.completed) {
+                                    resetModal();
+                                }
                             }}
                         >
                             Sign Up
@@ -78,11 +99,12 @@ export const SignUpModal = (
                 <FormField
                     label="First Name"
                     description="Enter your First Name"
+                    errorText={invalidInputs?.includes("firstName") ? "You must provide a first name." : ""}
                 >
                     <Input value={firstName} onChange={({ detail }) => setFirstName(detail.value)} placeholder="first name" />
                 </FormField>
                 <FormField
-                    label="Second Name"
+                    label={<span>Second Name <i> - optional</i></span>}
                     description="Enter your Second Name"
                 >
                     <Input value={secondName} onChange={({ detail }) => setSecondName(detail.value)} placeholder="second name" />
@@ -90,20 +112,23 @@ export const SignUpModal = (
                 <FormField
                     label="Username"
                     description="This username will be used when you log in to your new account"
+                    errorText={getUsernameErrorText()}
                 >
                     <Input value={enteredUsername} onChange={({ detail }) => setEnteredUsername(detail.value)} placeholder="username" />
                 </FormField>
                 <FormField
                     label="Password"
                     description="Enter your password"
+                    errorText={invalidInputs?.includes("password_invalid") ? "Your password must meet the requirements bellow." : ""}
                 >
-                    <Input value={password} onChange={({ detail }) => setPassword(detail.value)} placeholder="password" />
+                    <Input type="password" value={password} onChange={({ detail }) => setPassword(detail.value)} placeholder="password" />
                 </FormField>
                 <FormField
                     label="Confirm Password"
                     description="Enter your password again"
+                    errorText={invalidInputs?.includes("password_not_equal") ? "This does not match the password you entered." : ""}
                 >
-                    <Input value={confirmPassword} onChange={({ detail }) => setConfirmPassword(detail.value)} placeholder="confirm password" />
+                    <Input type="password" value={confirmPassword} onChange={({ detail }) => setConfirmPassword(detail.value)} placeholder="confirm password" />
                 </FormField>
                 <FormField
                     description={
@@ -113,8 +138,9 @@ export const SignUpModal = (
                             variant="primary"
                             fontSize="body-s"
                             onFollow={() => {
-                                setLoginVisible(true)
-                                setVisible(false)
+                                setLoginVisible(true);
+                                setVisible(false);
+                                resetModal();
                             }}
                           >
                             Login
