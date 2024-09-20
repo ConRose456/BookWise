@@ -2,6 +2,7 @@ import { Box, Button, FormField, Header, Input, Link, Modal, Popover, SpaceBetwe
 import React, { useContext, useState } from "react"
 import { submitLoginForm } from "../helpers/loginForm";
 import { AuthTokenStateContext, AuthTokenStateController } from "../controllers/AuthTokenStateController";
+import { useEffect } from "react";
 
 export const LoginModal = (
     {
@@ -25,19 +26,18 @@ export const LoginModal = (
 
     const [invalidInputs, setInvalidInputs] = useState(false);
 
-    const resetModal = () => {
+    useEffect(() => {
         setEnteredUsername("");
         setEnteredPassword("");
         setInvalidInputs(false);
         setLoading(false);
-    }
+    }, [visible]);
 
     return (
         <Modal
             onDismiss={() => {
                 if (!loading) {
                     setVisible(false)
-                    resetModal()
                 }
             }}
             visible={visible}
@@ -61,12 +61,10 @@ export const LoginModal = (
                                     setInvalidInputs
                                 );
 
-                                authTokenStateController.setIsAuthorised(
-                                    AuthTokenStateController.isAuthorized()
-                                );
-
-                                if (login.completed && authTokenStateController.isAuthorized) {
-                                    resetModal();
+                                if (login.completed) {
+                                    authTokenStateController.setIsAuthorised(
+                                        AuthTokenStateController.isAuthorized()
+                                    );
                                 }
                                 setLoading(false);
                             }}>Login</Button>
@@ -113,7 +111,6 @@ export const LoginModal = (
                                     if (!loading) {
                                         setSignUpVisible(true);
                                         setVisible(false);
-                                        resetModal();
                                     }
                                 }}
                             >

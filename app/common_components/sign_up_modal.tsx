@@ -2,6 +2,7 @@ import { Box, Button, FormField, Header, Input, Link, Modal, Popover, SpaceBetwe
 import { useContext, useState } from "react";
 import { submitSignUpForm } from "../helpers/signUpForm";
 import { AuthTokenStateContext, AuthTokenStateController } from "../controllers/AuthTokenStateController";
+import { useEffect } from "react";
 
 
 export const SignUpModal = (
@@ -41,7 +42,7 @@ export const SignUpModal = (
         return "";
     }
 
-    const resetModal = () => {
+    useEffect(() => {
         setFirstName("");
         setSecondName("");
         setEnteredUsername("");
@@ -49,13 +50,13 @@ export const SignUpModal = (
         setConfirmPassword("");
         setInvalidInputs([]);
         setLoading(false);
-    }
+    }, [visible]);
+
     return (
         <Modal
             onDismiss={() => {
                 if (!loading) {
                     setVisible(false);
-                    resetModal();
                 }
             }}
             visible={visible}
@@ -82,12 +83,10 @@ export const SignUpModal = (
                                     setInvalidInputs
                                 );
 
-                                authTokenStateController.setIsAuthorised(
-                                    AuthTokenStateController.isAuthorized()
-                                );
-
-                                if (signUp.completed && authTokenStateController.isAuthorized) {
-                                    resetModal();
+                                if (signUp.completed) {
+                                    authTokenStateController.setIsAuthorised(
+                                        AuthTokenStateController.isAuthorized()
+                                    );
                                 }
                                 setLoading(false);
                             }}
@@ -158,7 +157,6 @@ export const SignUpModal = (
                                 if (!loading) {
                                     setLoginVisible(true);
                                     setVisible(false);
-                                    resetModal();
                                 }
                             }}
                           >

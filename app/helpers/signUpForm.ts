@@ -10,7 +10,6 @@ export const submitSignUpForm = async (
     const invalidInputs = [];
 
     const usernameExist = await usernameExists(username);
-    console.log(usernameExist);
 
     if (firstName.length == 0) {
         invalidInputs.push("firstName")
