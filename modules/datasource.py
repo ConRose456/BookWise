@@ -36,9 +36,23 @@ class Book(Base):
     
     id = Column(Integer, primary_key=True)
     title = Column(String)
+
+    author = Column(String)
+    description = Column(String)
+
+    image_url = Column(String)
     
     renters = relationship('User', secondary=rented_books_table, back_populates='rented_books')
     collections = relationship('Collection', secondary=collection_books_table, back_populates='books')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'author': self.author,
+            'description': self.description,
+            'image_url': self.image_url,
+        }
 
 class OwnedBook(Base):
     __tablename__ = 'owned_books'

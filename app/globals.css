@@ -7,10 +7,20 @@ main {
 }
 
 .header {
-  margin-left: 5%;
+  margin-left: 3%;
 }
 
-.container {
-  margin-left: 5%;
+.search_input {
+  margin-left: 3%;
   margin-right: 40%;
+}
+
+.item_card {
+  width: 100%;
+  display: flex;
+}
+
+.items_grid {
+  margin-left: 3%;
+  margin-top: 3%;
 }
