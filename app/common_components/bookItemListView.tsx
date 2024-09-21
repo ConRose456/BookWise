@@ -12,7 +12,7 @@ export const PaginationContext = createContext({
 
 const PAGE_MAX_SIZE = 21;
 
-export const BookItemListView = () => {
+export const BookItemListView = ({searchQueryValue}: {searchQueryValue: string}) => {
     const [pageCount, setPageCount] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -30,7 +30,7 @@ export const BookItemListView = () => {
             setItems([]);
             setLoading(true);
             await fetch(
-                `/api/all_books?page=${currentPage}&page_size${PAGE_MAX_SIZE}`,
+                `/api/all_books?page=${currentPage}&page_size${PAGE_MAX_SIZE}&query${searchQueryValue}`,
                 {
                     method: "GET",
                     headers: {
@@ -55,7 +55,7 @@ export const BookItemListView = () => {
                 });
         }
         fetchBooks();
-    }, [currentPage]);
+    }, [currentPage, searchQueryValue]);
 
     return (
             <PaginationContext.Provider value={{

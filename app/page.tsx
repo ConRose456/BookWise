@@ -23,7 +23,8 @@ import { BookItemListView } from './common_components/bookItemListView';
 if (typeof window === "undefined") React.useLayoutEffect = () => { };
 
 export default function Home() {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchInputValue, setSearchInputValue] = useState("");
+  const [searchQueryValue, setSearchQueryValue] = useState("");
 
   const [isLoginVisible, setLoginVisible] = React.useState(false);
   const [isSignUpVisible, setSignUpVisible] = React.useState(false);
@@ -134,13 +135,18 @@ export default function Home() {
               >
                 <SpaceBetween direction='vertical' size='l'>
                   <Input
-                    onChange={({ detail }) => setSearchValue(detail.value)}
-                    value={searchValue}
+                    onChange={({ detail }) => setSearchInputValue(detail.value)}
+                    value={searchInputValue}
+                    onKeyDown={({detail}) => {
+                      if (detail.key == "Enter") {
+                        setSearchQueryValue(searchInputValue)
+                      }
+                    }}
                     placeholder="Search"
                     type="search"
                     className='search_input'
                   />
-                  <BookItemListView />
+                  <BookItemListView searchQueryValue={searchQueryValue} />
                 </SpaceBetween>
               </ContentLayout>
             </div>
