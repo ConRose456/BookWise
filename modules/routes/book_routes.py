@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from modules import datasource
+import datasource
 
 import json
 
