@@ -13,12 +13,17 @@ export const PaginationContext = createContext({
 const PAGE_MAX_SIZE = 1;
 
 export const BookItemListView = () => {
-    const [pageCount, setPageCount] = useState(getDefaultPageCount() ?? 1);
-    const [currentPage, setCurrentPage] = useState(getDefaultPageNumber() ?? 1);
+    const [pageCount, setPageCount] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const [items, setItems] = useState<any[]>();
 
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setPageCount(getDefaultPageCount() ?? 1);
+        setCurrentPage(getDefaultPageNumber() ?? 1);
+    }, []);
 
     useEffect(() => {
         const fetchBooks: any = async () => {
