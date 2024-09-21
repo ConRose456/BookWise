@@ -30,7 +30,7 @@ export const BookItemListView = ({searchQueryValue}: {searchQueryValue: string})
             setItems([]);
             setLoading(true);
             await fetch(
-                `/api/all_books?page=${currentPage}&page_size${PAGE_MAX_SIZE}&query${searchQueryValue}`,
+                `/api/all_books?page=${currentPage}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
                 {
                     method: "GET",
                     headers: {
@@ -41,10 +41,9 @@ export const BookItemListView = ({searchQueryValue}: {searchQueryValue: string})
             )
                 .then(response => response.json())
                 .then(({ books, pagination }) => {
-                    const parsedPagination = JSON.parse(pagination);
-
+                    const parsedPagination = pagination ? JSON.parse(pagination) : undefined;
                     setItems(JSON.parse(books));
-                    setPageCount(parsedPagination.total_pages ?? 1);
+                    setPageCount(parsedPagination?.total_pages ?? 1);
                 })
                 .catch(error => console.log(error))
                 .finally(() => {

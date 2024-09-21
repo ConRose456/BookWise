@@ -1,15 +1,12 @@
 from flask import Blueprint, jsonify, request
-import modules.datasource as datasource
+from sqlalchemy import or_
 
+import modules.datasource as datasource
 import json
 
 book_bp = Blueprint('books', __name__)
 
-@book_bp.route("/api/all_books", methods=["GET"])
-def getAllBooks():
-    session = datasource.initDatasource()
-    books = session.query(datasource.Book).all()
-
+def paginateBooks(request):
     try:
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 21))
@@ -21,10 +18,28 @@ def getAllBooks():
     
     offset = (page - 1) * page_size
 
-    books_query = session.query(datasource.Book).offset(offset).limit(page_size)
-    books = books_query.all()
+    return offset, page_size
 
-    total_books = session.query(datasource.Book).count()
+@book_bp.route("/api/all_books", methods=["GET"])
+def getAllBooks():
+    session = datasource.initDatasource()
+
+    search_query = request.args.get('query', '').strip()
+
+    offset, page_size = paginateBooks(request)
+
+    if len(search_query) == 0:
+        books_query = session.query(datasource.Book)
+
+    books_query = session.query(datasource.Book).filter(
+            or_(
+                datasource.Book.title.ilike(f"%{search_query}%"),
+                datasource.Book.author.ilike(f"%{search_query}%")
+            )
+        )
+    
+    books = books_query.offset(offset).limit(page_size).all()
+    total_books = books_query.count()
 
     session.close()
 
