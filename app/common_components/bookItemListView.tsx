@@ -10,7 +10,7 @@ export const PaginationContext = createContext({
     setCurrentPage: (value: any): any => value
 });
 
-const PAGE_MAX_SIZE = 1;
+const PAGE_MAX_SIZE = 21;
 
 export const BookItemListView = () => {
     const [pageCount, setPageCount] = useState(1);

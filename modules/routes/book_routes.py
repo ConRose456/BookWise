@@ -12,7 +12,7 @@ def getAllBooks():
 
     try:
         page = int(request.args.get('page', 1))
-        page_size = int(request.args.get('page_size', 1))
+        page_size = int(request.args.get('page_size', 21))
     except ValueError:
         return jsonify({'errors': 'Invalid pagination parameters'})
     
