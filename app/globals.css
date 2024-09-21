@@ -24,3 +24,10 @@ main {
   margin-left: 3%;
   margin-top: 3%;
 }
+
+.pagination {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}

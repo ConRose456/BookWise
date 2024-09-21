@@ -18,7 +18,7 @@ import { SignUpModal } from './common_components/sign_up_modal';
 import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
 import { useEffect } from 'react';
-import { ItemCardGrid } from './common_components/item_card_grid';
+import { BookItemListView } from './common_components/bookItemListView';
 
 if (typeof window === "undefined") React.useLayoutEffect = () => { };
 
@@ -140,8 +140,7 @@ export default function Home() {
                     type="search"
                     className='search_input'
                   />
-
-                  <ItemCardGrid />
+                  <BookItemListView />
                 </SpaceBetween>
               </ContentLayout>
             </div>
