@@ -1,45 +1,97 @@
+"use client";
+
 import { createContext, useEffect, useState } from "react";
 import { PaginateItemCardGrid } from "./pagination";
 import { ItemCardGrid } from "./item_card_grid";
-import { Box, SpaceBetween } from "@cloudscape-design/components";
+import { Box, SpaceBetween, Spinner } from "@cloudscape-design/components";
 
-export const PaginationContext = createContext({ 
-    currentPage: 1,  
+export const PaginationContext = createContext({
+    currentPage: 1,
     setCurrentPage: (value: any): any => value
 });
 
+const PAGE_MAX_SIZE = 1;
+
 export const BookItemListView = () => {
-    const [currentPage, setCurrentPage] = useState(1);
+    const [pageCount, setPageCount] = useState(getDefaultPageCount() ?? 1);
+    const [currentPage, setCurrentPage] = useState(getDefaultPageNumber() ?? 1);
+
     const [items, setItems] = useState<any[]>();
+
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchBooks: any = async () => {
-            const { books, errors } = await fetch("/api/all_books", {
-                method: "GET",
-                headers: {
-                    "Content-Type": 'application/json',
-                    "charset": 'UTF-8'
+            setItems([]);
+            setLoading(true);
+            await fetch(
+                `/api/all_books?page=${currentPage}&page_size${PAGE_MAX_SIZE}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": 'application/json',
+                        "charset": 'UTF-8'
+                    }
                 }
-            }).then(response => response.json());
+            )
+                .then(response => response.json())
+                .then(({ books, pagination }) => {
+                    const parsedPagination = JSON.parse(pagination);
 
-            setItems(JSON.parse(books));
+                    setItems(JSON.parse(books));
+                    setPageCount(parsedPagination.total_pages ?? 1);
+                })
+                .catch(error => console.log(error))
+                .finally(() => {
+                    if (typeof window !== "undefined") {
+                        savePageData(currentPage, pageCount);
+                    }
+                    setLoading(false);
+                });
         }
         fetchBooks();
     }, [currentPage]);
 
     return (
-        <div>
-            <PaginationContext.Provider value={{ 
-                currentPage: currentPage, 
+            <PaginationContext.Provider value={{
+                currentPage: currentPage,
                 setCurrentPage: setCurrentPage
             }}>
                 <SpaceBetween direction="vertical" size="xl">
-                    <ItemCardGrid items={items} />
+                    {
+                        !loading
+                            ? <ItemCardGrid items={items} />
+                            : <Box textAlign="center">
+                                <Spinner size="large" />
+                            </Box>
+                    }
                     <div className="pagination">
-                        <PaginateItemCardGrid />
+                        <PaginateItemCardGrid pageCount={pageCount} />
                     </div>
                 </SpaceBetween>
             </PaginationContext.Provider>
-        </div>
     );
 }
+
+const getDefaultPageNumber = (): number | undefined => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return Number(urlParams.get("currentPage"));
+}
+
+const getDefaultPageCount = (): number | undefined => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return Number(urlParams.get("pageCount"));
+}
+
+const savePageData = (currentPage: number, pageCount: number) => {
+    if (typeof window !== "undefined") {
+        window.history.pushState(
+            {},
+            "",
+            `${window.location.origin}/?${new URLSearchParams({
+                currentPage: `${currentPage}`,
+                pageCount: `${pageCount}`
+            })}`,
+        );
+    }
+};
