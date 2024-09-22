@@ -34,8 +34,8 @@ export const BookItemListView = (
     }, []);
 
     useEffect(() => {
+        setLoading(true);
         if (defaultsSet) {
-            setLoading(true);
             fetchContentCallBack(
                 setItems, 
                 setPageCount,
@@ -89,8 +89,8 @@ const savePageData = (searchQueryValue: string, currentPage: number, pageCount: 
             "",
             `${window.location.origin}/?${new URLSearchParams({
                 search: searchQueryValue,
-                currentPage: `${currentPage}`,
-                pageCount: `${pageCount}`
+                currentPage: `${currentPage > 0 ? currentPage : 1}`,
+                pageCount: `${pageCount > 0 ? pageCount : 1}`
             })}`,
         );
     }

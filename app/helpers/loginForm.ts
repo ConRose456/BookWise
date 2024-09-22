@@ -5,7 +5,8 @@ export const submitLoginForm = async (
         : { username: string, password: string },
     setUserText: (value: any) => any,
     setVisible: (value: boolean) => any,
-    setInvalidInputs: (value: boolean) => any
+    setInvalidInputs: (value: boolean) => any,
+    setAuthed: (value: boolean) => any
 ) => {
     const { userText, token, errors } = await fetch("/api/login", {
         method: 'POST',
@@ -21,6 +22,7 @@ export const submitLoginForm = async (
     if (!errors) {
         AuthTokenStateController.setAuthToken(token);
         setUserText(userText);
+        setAuthed(true);
         setVisible(false);
         return { completed: true };
     }

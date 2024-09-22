@@ -5,7 +5,8 @@ export const submitSignUpForm = async (
     : {firstName: string, secondName: string, username: string, password: string, confirmPassword: string},
     setUserText: (value: any) => any,
     setVisible: (value: boolean) => any,
-    setInvalidInputs: (value: any[] | undefined) => any
+    setInvalidInputs: (value: any[] | undefined) => any,
+    setAuthed: (value: boolean) => any
 ) => {
     const invalidInputs = [];
 
@@ -50,6 +51,7 @@ export const submitSignUpForm = async (
         if (!errors) {
             AuthTokenStateController.setAuthToken(token);
             setUserText(userText);
+            setAuthed(true);
             setVisible(false);
             return { completed: true };
         } else {

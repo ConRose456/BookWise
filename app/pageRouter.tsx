@@ -5,11 +5,9 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 
 export default function PageRoute() {
     return (
-        <HashRouter>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/owned_books" element={<OwnedBooks />} />
             </Routes>
-        </HashRouter>
     );
 };

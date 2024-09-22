@@ -1,11 +1,18 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useState } from "react";
-import { getDefaultSearchValue } from "../common_components/bookItemListView";
+import { BookItemListView, getDefaultSearchValue } from "../common_components/bookItemListView";
 import { ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
+import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
+import { SignUpContext } from "../controllers/SignUpContext";
+import { useNavigate } from "react-router-dom";
+
+const PAGE_MAX_SIZE = 21;
 
 export const OwnedBooks = () => {
+    const { setShouldSignUp } = useContext(SignUpContext);
+
     const [defaultsSet, setDefaultsSet] = useState(false);
 
     const [searchInputValue, setSearchInputValue] = useState("");
@@ -16,6 +23,36 @@ export const OwnedBooks = () => {
         setSearchQueryValue(getDefaultSearchValue() ?? "");
         setDefaultsSet(true);
     }, []);
+
+    const fetchBooks: any = async (
+        setItems: (value: any[]) => void, 
+        setPageCount: (value: number) => void, 
+        currentPage: number,
+    ) => {
+        setItems([]);
+        await fetch(
+            `/api/user_books?page=${currentPage}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": 'application/json',
+                    "charset": 'UTF-8',
+                    "Authorization": `Bearer ${AuthTokenStateController.getAuthToken()}`
+                }
+            }
+        )
+            .then(response => response.json())
+            .then(({ books, pagination, isAuthed }) => {
+                if (isAuthed) {
+                    const parsedPagination = pagination ?? undefined;
+                    setItems(JSON.parse(books));
+                    setPageCount(JSON.parse(parsedPagination)?.total_pages ?? 1);
+                } else {
+                    setShouldSignUp(true);
+                }
+            })
+            .catch(error => console.log(error));
+    }
 
     return (
         <div>
@@ -47,6 +84,7 @@ export const OwnedBooks = () => {
                 className='search_input'
               />
             </SpaceBetween>
+            <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet} fetchContentCallBack={fetchBooks} />
           </ContentLayout>
     </div>
     );

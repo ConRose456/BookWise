@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import { submitSignUpForm } from "../helpers/signUpForm";
 import { AuthTokenStateContext, AuthTokenStateController } from "../controllers/AuthTokenStateController";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 export const SignUpModal = (
@@ -10,15 +11,17 @@ export const SignUpModal = (
         visible, 
         setVisible,
         setLoginVisible,
-        setUserText
+        setUserText,
+        setAuthed
     }: { 
         visible: boolean, 
         setVisible: (value: boolean) => any,
         setLoginVisible: (value: boolean) => any,
-        setUserText: (value: string) => any 
+        setUserText: (value: string) => any ,
+        setAuthed: (value: boolean) => any
     }
 ) => {
-
+    const navigate = useNavigate();
     const { authTokenStateController } = useContext(AuthTokenStateContext);
 
     const [loading, setLoading] = useState(false);
@@ -57,13 +60,21 @@ export const SignUpModal = (
             onDismiss={() => {
                 if (!loading) {
                     setVisible(false);
+                    navigate("/", { replace: true });
                 }
             }}
             visible={visible}
             footer={
                 <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
-                        <Button variant="link" disabled={loading} onClick={() => setVisible(false)}>Cancel</Button>
+                        <Button 
+                            variant="link" 
+                            disabled={loading} 
+                            onClick={() => {
+                                setVisible(false);
+                                navigate("/", { replace: true });
+                            }}
+                        >Cancel</Button>
                         <Button
                             variant="primary"
                             loading={loading}
@@ -80,7 +91,8 @@ export const SignUpModal = (
                                     },
                                     setUserText,
                                     setVisible,
-                                    setInvalidInputs
+                                    setInvalidInputs,
+                                    setAuthed
                                 );
 
                                 if (signUp.completed) {

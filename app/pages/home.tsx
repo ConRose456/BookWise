@@ -24,8 +24,10 @@ export const Home = () => {
         currentPage: number,
     ) => {
         setItems([]);
+        const page = currentPage > 0 ? currentPage : 1;
+
         await fetch(
-            `/api/all_books?page=${currentPage}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
+            `/api/all_books?page=${page}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
             {
                 method: "GET",
                 headers: {

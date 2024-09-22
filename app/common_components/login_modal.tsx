@@ -9,12 +9,14 @@ export const LoginModal = (
         visible,
         setVisible,
         setSignUpVisible,
-        setUserText
+        setUserText,
+        setAuthed
     }: {
         visible: boolean,
         setVisible: (value: boolean) => any,
         setSignUpVisible: (value: boolean) => any,
-        setUserText: (value: string) => any
+        setUserText: (value: string) => any,
+        setAuthed: (value: boolean) => any
     }
 ) => {
     const { authTokenStateController } = useContext(AuthTokenStateContext);
@@ -58,7 +60,8 @@ export const LoginModal = (
                                     },
                                     setUserText,
                                     setVisible,
-                                    setInvalidInputs
+                                    setInvalidInputs,
+                                    setAuthed
                                 );
 
                                 if (login.completed) {

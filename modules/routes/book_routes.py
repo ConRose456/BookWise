@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import or_
+from modules.auth import token_required
 
 import modules.datasource as datasource
 import json
@@ -28,15 +29,12 @@ def getAllBooks():
 
     offset, page_size = paginateBooks(request)
 
-    if len(search_query) == 0:
-        books_query = session.query(datasource.Book)
-
     books_query = session.query(datasource.Book).filter(
-            or_(
-                datasource.Book.title.ilike(f"%{search_query}%"),
-                datasource.Book.author.ilike(f"%{search_query}%")
-            )
+        or_(
+            datasource.Book.title.ilike(f"%{search_query}%"),
+            datasource.Book.author.ilike(f"%{search_query}%")
         )
+    )
     
     books = books_query.offset(offset).limit(page_size).all()
     total_books = books_query.count()
@@ -54,3 +52,46 @@ def getAllBooks():
         'books': json.dumps([book.to_dict() for book in books]),
         'pagination': json.dumps(pagination)
     })
+
+@book_bp.route("/api/user_books", methods=["GET"])
+@token_required
+def getUserBooks(current_user, isAuthed):
+    if not (isAuthed):
+        return jsonify({'isAuthed': isAuthed, 'books': json.dumps([])})
+    
+    session = datasource.initDatasource()
+
+    search_query = request.args.get('query', '').strip()
+    offset, page_size = paginateBooks(request)
+
+    owned_books_query = session.query(datasource.OwnedBook).filter(
+            datasource.OwnedBook.user_id == current_user.username,
+            or_(
+                datasource.Book.title.ilike(f"%{search_query}%"),
+                datasource.Book.author.ilike(f"%{search_query}%")
+            )
+     ).join(datasource.Book)
+    
+    books = owned_books_query.offset(offset).limit(page_size).all()
+    total_books = owned_books_query.count()
+
+    session.close()
+
+    if not books:
+        return jsonify({'books': json.dumps([]), 'isAuthed': True, 'errors': 'failed_books_fetch'})
+    
+    pagination = {
+        'total_pages': (total_books + page_size - 1) // page_size
+    }
+
+    return jsonify({
+        'books': json.dumps([book.to_dict() for book in books]),
+        'pagination': json.dumps(pagination),
+        'isAuthed': True
+    })
+
+
+    
+
+    
+
