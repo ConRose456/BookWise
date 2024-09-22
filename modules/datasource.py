@@ -5,16 +5,6 @@ import os
 
 Base = declarative_base()
 
-rented_books_table = Table('rented_books', Base.metadata,
-    Column('user_username', String, ForeignKey('users.username')),
-    Column('book_id', Integer, ForeignKey('books.id'))
-)
-
-collection_books_table = Table('collection_books', Base.metadata,
-    Column('collection_id', Integer, ForeignKey('collections.id')),
-    Column('book_id', Integer, ForeignKey('books.id'))
-)
-
 class User(Base):
     __tablename__ = 'users'
     
@@ -27,9 +17,6 @@ class User(Base):
     second_name = Column(String)
     
     owned_books = relationship('OwnedBook', back_populates='user')
-    
-    rented_books = relationship('Book', secondary=rented_books_table, back_populates='renters')
-    collections = relationship('Collection', back_populates='user')
 
 class Book(Base):
     __tablename__ = 'books'
@@ -41,9 +28,6 @@ class Book(Base):
     description = Column(String)
 
     image_url = Column(String)
-    
-    renters = relationship('User', secondary=rented_books_table, back_populates='rented_books')
-    collections = relationship('Collection', secondary=collection_books_table, back_populates='books')
 
     def to_dict(self):
         return {
@@ -67,16 +51,6 @@ class OwnedBook(Base):
 
     def to_ids(self):
         return self.id
-
-class Collection(Base):
-    __tablename__ = 'collections'
-    
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    user_id = Column(String, ForeignKey('users.username'))
-    
-    user = relationship('User', back_populates='collections')
-    books = relationship('Book', secondary=collection_books_table, back_populates='collections')
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 engine = create_engine(DATABASE_URL)

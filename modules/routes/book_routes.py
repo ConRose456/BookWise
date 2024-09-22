@@ -95,6 +95,41 @@ def getUserBooks(current_user, session, isAuthed):
         'isAuthed': True
     })
 
+@book_bp.route("/api/add_owned_book", methods=["POST"])
+@token_required
+def add_owned_book(current_user, session, isAuthed):
+    if not (isAuthed):
+        return jsonify({'isAuthed': isAuthed, 'success': False})
+    
+    try:
+        data = request.json
+
+        existing_owned_book = session.query(datasource.OwnedBook).filter_by(
+            user_id=current_user.username,
+            book_id=data["title_id"]
+        ).first()
+
+        if existing_owned_book:
+            if not existing_owned_book.removed:
+                return {'success': False, 'message': 'Book already exists in your collection.'}
+            else:
+                # If the book was removed, we update the 'removed' flag to False
+                existing_owned_book.removed = False
+                session.commit()
+                return {'success': True, 'message': 'Book was previously removed and has been re-added to your collection.'}
+        else:
+            # If the book does not exist, add it to the owned_books table
+            new_owned_book = datasource.OwnedBook(user_id=current_user.username, book_id=data["title_id"])
+            session.add(new_owned_book)
+            session.commit()
+            return {'success': True, 'message': 'Book successfully added to your collection.'}
+    except Exception as e:
+        session.rollback()
+        return {'error': str(e)}, 500
+    finally:
+        session.close()
+
+
 @book_bp.route("/api/remove_user_book", methods=["POST"])
 @token_required
 def remove_user_book(current_user, session, isAuthed):
