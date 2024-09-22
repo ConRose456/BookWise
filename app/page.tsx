@@ -18,11 +18,13 @@ import { SignUpModal } from './common_components/sign_up_modal';
 import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
 import { useEffect } from 'react';
-import { BookItemListView } from './common_components/bookItemListView';
+import { BookItemListView, getDefaultSearchValue } from './common_components/bookItemListView';
 
 if (typeof window === "undefined") React.useLayoutEffect = () => { };
 
 export default function Home() {
+  const [defaultsSet, setDefaultsSet] = useState(false);
+
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchQueryValue, setSearchQueryValue] = useState("");
 
@@ -33,10 +35,13 @@ export default function Home() {
   const [isAuthorized, setIsAuthorised] = React.useState(false);
 
   useEffect(() => {
+    setSearchInputValue(getDefaultSearchValue() ?? "");
+    setSearchQueryValue(getDefaultSearchValue() ?? "");
     if (typeof window !== "undefined") {
       setIsAuthorised(AuthTokenStateController.isAuthorized());
       setUserDisplayText(AuthTokenStateController.getUserDisplayText());
     }
+    setDefaultsSet(true);
   }, []);
   
   const getLoginUtilsItems = (): InternalItemOrGroup[] => {
@@ -139,14 +144,14 @@ export default function Home() {
                     value={searchInputValue}
                     onKeyDown={({detail}) => {
                       if (detail.key == "Enter") {
-                        setSearchQueryValue(searchInputValue)
+                        setSearchQueryValue(searchInputValue);
                       }
                     }}
                     placeholder="Search"
                     type="search"
                     className='search_input'
                   />
-                  <BookItemListView searchQueryValue={searchQueryValue} />
+                  <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet}/>
                 </SpaceBetween>
               </ContentLayout>
             </div>

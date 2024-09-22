@@ -12,7 +12,12 @@ export const PaginationContext = createContext({
 
 const PAGE_MAX_SIZE = 21;
 
-export const BookItemListView = ({searchQueryValue}: {searchQueryValue: string}) => {
+export const BookItemListView = (
+    { searchQueryValue, defaultsSet }
+        : { searchQueryValue: string, defaultsSet: boolean }
+) => {
+
+
     const [pageCount, setPageCount] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -26,55 +31,60 @@ export const BookItemListView = ({searchQueryValue}: {searchQueryValue: string})
     }, []);
 
     useEffect(() => {
-        const fetchBooks: any = async () => {
-            setItems([]);
-            setLoading(true);
-            await fetch(
-                `/api/all_books?page=${currentPage}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": 'application/json',
-                        "charset": 'UTF-8'
+        if (defaultsSet) {
+            const fetchBooks: any = async () => {
+                setItems([]);
+                setLoading(true);
+                await fetch(
+                    `/api/all_books?page=${currentPage}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": 'application/json',
+                            "charset": 'UTF-8'
+                        }
                     }
-                }
-            )
-                .then(response => response.json())
-                .then(({ books, pagination }) => {
-                    const parsedPagination = pagination ? JSON.parse(pagination) : undefined;
-                    setItems(JSON.parse(books));
-                    setPageCount(parsedPagination?.total_pages ?? 1);
-                })
-                .catch(error => console.log(error))
-                .finally(() => {
-                    if (typeof window !== "undefined") {
-                        savePageData(currentPage, pageCount);
-                    }
-                    setLoading(false);
-                });
+                )
+                    .then(response => response.json())
+                    .then(({ books, pagination }) => {
+                        const parsedPagination = pagination ? JSON.parse(pagination) : undefined;
+                        setItems(JSON.parse(books));
+                        setPageCount(parsedPagination?.total_pages ?? 1);
+                    })
+                    .catch(error => console.log(error))
+                    .finally(() => {
+                        savePageData(searchQueryValue, currentPage, pageCount);
+                        setLoading(false);
+                    });
+            }
+            fetchBooks();
         }
-        fetchBooks();
-    }, [currentPage, searchQueryValue]);
+    }, [currentPage, searchQueryValue, defaultsSet]);
 
     return (
-            <PaginationContext.Provider value={{
-                currentPage: currentPage,
-                setCurrentPage: setCurrentPage
-            }}>
-                <SpaceBetween direction="vertical" size="xl">
-                    {
-                        !loading
-                            ? <ItemCardGrid items={items} />
-                            : <Box textAlign="center">
-                                <Spinner size="large" />
-                            </Box>
-                    }
-                    <div className="pagination">
-                        <PaginateItemCardGrid pageCount={pageCount} />
-                    </div>
-                </SpaceBetween>
-            </PaginationContext.Provider>
+        <PaginationContext.Provider value={{
+            currentPage: currentPage,
+            setCurrentPage: setCurrentPage
+        }}>
+            <SpaceBetween direction="vertical" size="xl">
+                {
+                    !loading
+                        ? <ItemCardGrid items={items} />
+                        : <Box textAlign="center">
+                            <Spinner size="large" />
+                        </Box>
+                }
+                <div className="pagination">
+                    <PaginateItemCardGrid pageCount={pageCount} />
+                </div>
+            </SpaceBetween>
+        </PaginationContext.Provider>
     );
+}
+
+export const getDefaultSearchValue = (): string | undefined => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("search") ?? undefined;
 }
 
 const getDefaultPageNumber = (): number | undefined => {
@@ -87,12 +97,13 @@ const getDefaultPageCount = (): number | undefined => {
     return Number(urlParams.get("pageCount"));
 }
 
-const savePageData = (currentPage: number, pageCount: number) => {
+const savePageData = (searchQueryValue: string, currentPage: number, pageCount: number) => {
     if (typeof window !== "undefined") {
         window.history.pushState(
             {},
             "",
             `${window.location.origin}/?${new URLSearchParams({
+                search: searchQueryValue,
                 currentPage: `${currentPage}`,
                 pageCount: `${pageCount}`
             })}`,
