@@ -6,35 +6,51 @@ import {
     TopNavigation
 } from '@cloudscape-design/components';
 import "./globals.css";
-import React from 'react';
+import React, { useContext } from 'react';
 import { LoginModal } from './common_components/login_modal';
 import { SignUpModal } from './common_components/sign_up_modal';
-import { AuthTokenStateController } from './controllers/AuthTokenStateController';
+import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
 import { useEffect } from 'react';
 import { SignUpContext } from './controllers/SignUpContext';
 import dynamic from 'next/dynamic';
 import { HashRouter, useNavigate } from 'react-router-dom';
 
-const PageRouterComponent = dynamic(() => import('./pageRouter'), {ssr: false} )
+const PageRouterComponent = dynamic(() => import('./pageRouter'), { ssr: false })
 
 export default function PageLayout() {
+    const { userDisplayTextUseState, authTokenStateController } = useContext(AuthTokenStateContext);
     const { shouldSignUp, setShouldSignUp } = React.useContext(SignUpContext);
+
     const [isLoginVisible, setLoginVisible] = React.useState(false);
 
-    const [userDisplayText, setUserDisplayText] = React.useState("");
-    const [isAuthorized, setIsAuthorised] = React.useState(false);
-
+    // Ensures UX update on auth change and intital load
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            setIsAuthorised(AuthTokenStateController.isAuthorized());
-            setUserDisplayText(AuthTokenStateController.getUserDisplayText());
-        }
-    }, [isAuthorized]);
+        authTokenStateController.setIsAuthorised(AuthTokenStateController.isAuthorized());
+        userDisplayTextUseState.setUserDisplayText(
+            authTokenStateController.isAuthorized 
+                ? AuthTokenStateController.getUserDisplayText()
+                : ""
+        );
+    }, [authTokenStateController.isAuthorized]);
 
+    // This updates UI on user auth token timeout
+    useEffect(() => {
+        const checkAuthed = () => {
+            if (!AuthTokenStateController.isAuthorized()) {
+                authTokenStateController.setIsAuthorised(false);
+                userDisplayTextUseState.setUserDisplayText("");
+                window.location.reload();
+            }
+        }
+
+        // Calls checkAuth every hour
+        const interval = setInterval(checkAuthed, 3600000);
+        return () => clearInterval(interval);
+    }, []);
 
     const getLoginUtilsItems = (): InternalItemOrGroup[] => {
-        if (isAuthorized) {
+        if (authTokenStateController.isAuthorized) {
             return [
                 { itemType: "action", text: "Sign Out", id: "sign_out" },
             ];
@@ -58,7 +74,7 @@ export default function PageLayout() {
                     {
                         type: "menu-dropdown",
                         iconName: "user-profile",
-                        text: userDisplayText,
+                        text: userDisplayTextUseState.userDisplayText,
                         items: getLoginUtilsItems(),
                         onItemClick: ({ detail }) => {
                             if (detail.id == "login") {
@@ -66,9 +82,9 @@ export default function PageLayout() {
                             } else if (detail.id == "sign_up") {
                                 setShouldSignUp(true);
                             } else if (detail.id == "sign_out") {
-                                setUserDisplayText("");
+                                userDisplayTextUseState.setUserDisplayText("");
                                 AuthTokenStateController.deleteAuthToken();
-                                setIsAuthorised(false);
+                                authTokenStateController.setIsAuthorised(false);
                                 window.history.replaceState({}, "", `${window.location.origin}`)
                                 window.location.reload();
                             }
@@ -93,15 +109,15 @@ export default function PageLayout() {
                         visible={isLoginVisible}
                         setVisible={setLoginVisible}
                         setSignUpVisible={setShouldSignUp}
-                        setUserText={setUserDisplayText} 
-                        setAuthed={setIsAuthorised}
+                        setUserText={userDisplayTextUseState.setUserDisplayText} 
+                        setAuthed={authTokenStateController.setIsAuthorised}
                     />
                     <SignUpModal
                         visible={shouldSignUp}
                         setVisible={setShouldSignUp}
                         setLoginVisible={setLoginVisible}
-                        setUserText={setUserDisplayText}
-                        setAuthed={setIsAuthorised}
+                        setUserText={userDisplayTextUseState.setUserDisplayText}
+                        setAuthed={authTokenStateController.setIsAuthorised}
                     />
                     <PageRouterComponent />
                 </div>}
