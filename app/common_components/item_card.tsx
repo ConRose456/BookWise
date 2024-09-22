@@ -4,8 +4,9 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import Box from "@cloudscape-design/components/box";
 import Link from "@cloudscape-design/components/link";
 import Button from "@cloudscape-design/components/button";
-import { removeOwnedBook } from "../helpers/userRemoveOwnedBook";
 import { RemoveOwnedBookModal } from "./removeOwnedBookModal";
+import { addOwnedBook } from "../helpers/userAddOwnedBook";
+import { UserOwnsBookModal } from "./userOwnsBookModal";
 
 export const ItemCard = (
   {
@@ -24,8 +25,13 @@ export const ItemCard = (
     userOwned?: boolean
   }
 ) => {
-  const [modaVisible, setModalVisible] = React.useState(false);
+  const [removeModalVisible, setRemoveModalVisible] = React.useState(false);
+  const [addModalVisible, setAddModalVisible] = React.useState(false);
+  const [addModalMessage, setAddModalMessage] = React.useState("");
+
   const [loading, setLoading] = React.useState(false);
+
+  const [bookAdded, setBookAdded] = React.useState(false);
 
   return (
     <Container
@@ -41,23 +47,46 @@ export const ItemCard = (
         width: "33%",
       }}
       footer={
-        <Box>
+        <Box float="right">
           {!userOwned ?
-            <Button>Add to Owned</Button>
+            <Button
+              loading={loading}
+              disabled={bookAdded}
+              variant={bookAdded ? "primary" : "normal"}
+              onClick={async () => {
+                setLoading(true);
+                await addOwnedBook(id)
+                  .then(response => {
+                    if (response.success) {
+                      setBookAdded(true);
+                    } else {
+                      setAddModalMessage(response.message)
+                      setAddModalVisible(true);
+                    }
+                  })
+                  .catch(error => console.error(error));
+                  setLoading(false);
+              }}
+            >{bookAdded ? "Book Added" : "Add to Owned"}</Button>
             : <Button
               onClick={async () => {
-                setModalVisible(true);
+                setRemoveModalVisible(true);
               }}
             >Remove Book</Button>
           }
         </Box>
       }
     >
+      <UserOwnsBookModal 
+        visible={addModalVisible}
+        setVisible={setAddModalVisible} 
+        message={addModalMessage}      
+      />
       <RemoveOwnedBookModal 
         id={id} 
         title={title}
-        visible={modaVisible} 
-        setVisible={setModalVisible} 
+        visible={removeModalVisible} 
+        setVisible={setRemoveModalVisible} 
         loading={loading} 
         setLoading={setLoading} 
       />
