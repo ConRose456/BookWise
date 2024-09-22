@@ -62,7 +62,7 @@ def getUserBooks(current_user, session, isAuthed):
     search_query = request.args.get('query', '').strip()
     offset, page_size = paginateBooks(request)
 
-    users_books_ids = session.query(datasource.OwnedBook.book_id).filter(
+    users_books_ids = session.query(datasource.OwnedBook.isbn).filter(
         datasource.OwnedBook.user_id == current_user.username,
         datasource.OwnedBook.removed == False 
     ).all()
@@ -70,7 +70,7 @@ def getUserBooks(current_user, session, isAuthed):
     books_query = session.query(
         datasource.Book
     ).filter(
-        datasource.Book.id.in_([id[0] for id in users_books_ids]),
+        datasource.Book.isbn.in_([isbn[0] for isbn in users_books_ids]),
         or_(
             datasource.Book.title.ilike(f"%{search_query}%"),
             datasource.Book.author.ilike(f"%{search_query}%")
@@ -106,7 +106,7 @@ def add_owned_book(current_user, session, isAuthed):
 
         existing_owned_book = session.query(datasource.OwnedBook).filter_by(
             user_id=current_user.username,
-            book_id=data["title_id"]
+            isbn=data["title_id"]
         ).first()
 
         if existing_owned_book:
@@ -119,7 +119,7 @@ def add_owned_book(current_user, session, isAuthed):
                 return {'success': True, 'message': 'Book was previously removed and has been re-added to your collection.'}
         else:
             # If the book does not exist, add it to the owned_books table
-            new_owned_book = datasource.OwnedBook(user_id=current_user.username, book_id=data["title_id"])
+            new_owned_book = datasource.OwnedBook(user_id=current_user.username, isbn=data["title_id"])
             session.add(new_owned_book)
             session.commit()
             return {'success': True, 'message': 'Book successfully added to your collection.'}
@@ -138,8 +138,7 @@ def remove_user_book(current_user, session, isAuthed):
     
     try:
         data = request.json
-        owned_book = session.query(datasource.OwnedBook).filter_by(user_id=current_user.username, book_id=data["title_id"]).first()
-    
+        owned_book = session.query(datasource.OwnedBook).filter_by(user_id=current_user.username, isbn=data["title_id"]).first()
         if not owned_book:
             return jsonify({'isAuthed': isAuthed, 'success': False})
     

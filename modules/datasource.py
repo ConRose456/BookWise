@@ -21,7 +21,7 @@ class User(Base):
 class Book(Base):
     __tablename__ = 'books'
     
-    id = Column(Integer, primary_key=True)
+    isbn = Column(Integer, primary_key=True)
     title = Column(String)
 
     author = Column(String)
@@ -31,7 +31,7 @@ class Book(Base):
 
     def to_dict(self):
         return {
-            'id': self.id,
+            'isbn': self.isbn,
             'title': self.title,
             'author': self.author,
             'description': self.description,
@@ -42,15 +42,12 @@ class OwnedBook(Base):
     __tablename__ = 'owned_books'
     
     id = Column(Integer, primary_key=True)
-    book_id = Column(Integer, ForeignKey('books.id'))
+    isbn = Column(Integer, ForeignKey('books.isbn'))
     user_id = Column(String, ForeignKey('users.username'))
     removed = Column(Boolean, default=False)
     
     user = relationship('User', back_populates='owned_books')
     book = relationship('Book')
-
-    def to_ids(self):
-        return self.id
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 engine = create_engine(DATABASE_URL)
