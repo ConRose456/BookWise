@@ -1,0 +1,15 @@
+import React from "react";
+import { Home } from "./pages/home";
+import { OwnedBooks } from "./pages/ownedBooks";
+import { HashRouter, Route, Routes } from "react-router-dom";
+
+export default function PageRoute() {
+    return (
+        <HashRouter>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/owned_books" element={<OwnedBooks />} />
+            </Routes>
+        </HashRouter>
+    );
+};

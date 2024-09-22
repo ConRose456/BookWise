@@ -10,14 +10,17 @@ export const PaginationContext = createContext({
     setCurrentPage: (value: any): any => value
 });
 
-const PAGE_MAX_SIZE = 21;
-
 export const BookItemListView = (
-    { searchQueryValue, defaultsSet }
-        : { searchQueryValue: string, defaultsSet: boolean }
+    { 
+        searchQueryValue, 
+        defaultsSet, 
+        fetchContentCallBack 
+    } : { 
+        searchQueryValue: string, 
+        defaultsSet: boolean, 
+        fetchContentCallBack: (...args: any) => void 
+    }
 ) => {
-
-
     const [pageCount, setPageCount] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -32,32 +35,14 @@ export const BookItemListView = (
 
     useEffect(() => {
         if (defaultsSet) {
-            const fetchBooks: any = async () => {
-                setItems([]);
-                setLoading(true);
-                await fetch(
-                    `/api/all_books?page=${currentPage}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": 'application/json',
-                            "charset": 'UTF-8'
-                        }
-                    }
-                )
-                    .then(response => response.json())
-                    .then(({ books, pagination }) => {
-                        const parsedPagination = pagination ? JSON.parse(pagination) : undefined;
-                        setItems(JSON.parse(books));
-                        setPageCount(parsedPagination?.total_pages ?? 1);
-                    })
-                    .catch(error => console.log(error))
-                    .finally(() => {
-                        savePageData(searchQueryValue, currentPage, pageCount);
-                        setLoading(false);
-                    });
-            }
-            fetchBooks();
+            setLoading(true);
+            fetchContentCallBack(
+                setItems, 
+                setPageCount,
+                currentPage,
+            );
+            savePageData(searchQueryValue, currentPage, pageCount);
+            setLoading(false);
         }
     }, [currentPage, searchQueryValue, defaultsSet]);
 

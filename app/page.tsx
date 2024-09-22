@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from 'react';
 import {
   AppLayout,
-  ContentLayout,
-  Header,
-  Input,
-  Link,
   SideNavigation,
-  SpaceBetween,
   TopNavigation
 } from '@cloudscape-design/components';
 import "./globals.css";
@@ -18,16 +12,13 @@ import { SignUpModal } from './common_components/sign_up_modal';
 import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
 import { useEffect } from 'react';
-import { BookItemListView, getDefaultSearchValue } from './common_components/bookItemListView';
+
+import dynamic from 'next/dynamic';
 
 if (typeof window === "undefined") React.useLayoutEffect = () => { };
+const PageRouterComponent = dynamic(() => import('./pageRouter'), {ssr: false} )
 
-export default function Home() {
-  const [defaultsSet, setDefaultsSet] = useState(false);
-
-  const [searchInputValue, setSearchInputValue] = useState("");
-  const [searchQueryValue, setSearchQueryValue] = useState("");
-
+export default function App() {
   const [isLoginVisible, setLoginVisible] = React.useState(false);
   const [isSignUpVisible, setSignUpVisible] = React.useState(false);
 
@@ -35,13 +26,10 @@ export default function Home() {
   const [isAuthorized, setIsAuthorised] = React.useState(false);
 
   useEffect(() => {
-    setSearchInputValue(getDefaultSearchValue() ?? "");
-    setSearchQueryValue(getDefaultSearchValue() ?? "");
     if (typeof window !== "undefined") {
       setIsAuthorised(AuthTokenStateController.isAuthorized());
       setUserDisplayText(AuthTokenStateController.getUserDisplayText());
     }
-    setDefaultsSet(true);
   }, []);
   
   const getLoginUtilsItems = (): InternalItemOrGroup[] => {
@@ -104,9 +92,7 @@ export default function Home() {
             }}
             items={[
               { type: 'link', text: `Home`, href: `#` },
-              { type: 'link', text: `My Collection`, href: `#` },
-              { type: 'link', text: `Owned Books`, href: `#` },
-              { type: 'link', text: `Rented Books`, href: `#` },
+              { type: 'link', text: `Owned Books`, href: `#/owned_books` },
               { type: 'link', text: `My Account`, href: `#` },
             ]}
           />}
@@ -124,36 +110,7 @@ export default function Home() {
                 setLoginVisible={setLoginVisible}
                 setUserText={setUserDisplayText}
               />
-              <ContentLayout
-                defaultPadding
-                headerVariant="high-contrast"
-                header={
-                  <Header
-                    className='header'
-                    variant="h1"
-                    info={<Link variant="info">Info</Link>}
-                    description="Search for your favirate books!"
-                  >
-                    Book Library
-                  </Header>
-                }
-              >
-                <SpaceBetween direction='vertical' size='l'>
-                  <Input
-                    onChange={({ detail }) => setSearchInputValue(detail.value)}
-                    value={searchInputValue}
-                    onKeyDown={({detail}) => {
-                      if (detail.key == "Enter") {
-                        setSearchQueryValue(searchInputValue);
-                      }
-                    }}
-                    placeholder="Search"
-                    type="search"
-                    className='search_input'
-                  />
-                  <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet}/>
-                </SpaceBetween>
-              </ContentLayout>
+              <PageRouterComponent />
             </div>
           }
         />
