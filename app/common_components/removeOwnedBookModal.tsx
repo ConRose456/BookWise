@@ -11,7 +11,7 @@ export const RemoveOwnedBookModal = (
         loading,
         setLoading
     }: {
-        id: number,
+        id: string,
         title: string,
         visible: boolean, 
         setVisible: (value: boolean) => void,

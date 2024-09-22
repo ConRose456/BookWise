@@ -39,7 +39,7 @@ export const ItemCardGrid = ({items, userOwned}: {items: any[] | undefined, user
                     (item) => (
                         <div>
                             <ItemCard
-                                id={item.id}
+                                id={item.isbn}
                                 title={item.title}
                                 author={item.author}
                                 description={item.description}

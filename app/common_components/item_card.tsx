@@ -17,7 +17,7 @@ export const ItemCard = (
     imageUrl,
     userOwned
   }: {
-    id: number,
+    id: string,
     title: string,
     author: string,
     description: string,

@@ -1,6 +1,6 @@
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 
-export const removeOwnedBook = async (titleId: number) => {
+export const removeOwnedBook = async (titleId: string) => {
     return await fetch(
         "/api/remove_user_book", {
             method: "POST",
@@ -9,8 +9,11 @@ export const removeOwnedBook = async (titleId: number) => {
                 "charset": 'UTF-8',
                 "Authorization": `Bearer ${AuthTokenStateController.getAuthToken()}`
             },
-            body: JSON.stringify({ title_id: titleId })
+            body: JSON.stringify({ title_id: `${titleId}` })
         }
-    ).then(response => response.json())
+    ).then(response => response.json()).then(data => {
+        console.log(data.data);
+        return data;
+    })
     .catch(error => console.log(error));
 }

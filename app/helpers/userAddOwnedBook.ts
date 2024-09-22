@@ -1,6 +1,6 @@
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 
-export const addOwnedBook = async (titleId: number) => {
+export const addOwnedBook = async (titleId: string) => {
     return await fetch(
         "/api/add_owned_book", {
             method: "POST",
