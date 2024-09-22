@@ -4,20 +4,29 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import Box from "@cloudscape-design/components/box";
 import Link from "@cloudscape-design/components/link";
 import Button from "@cloudscape-design/components/button";
+import { removeOwnedBook } from "../helpers/userRemoveOwnedBook";
+import { RemoveOwnedBookModal } from "./removeOwnedBookModal";
 
 export const ItemCard = (
-    {
-        title,
-        author,
-        description,
-        imageUrl
-    } : {
-        title: string,
-        author: string,
-        description: string,
-        imageUrl: string,
-    }
+  {
+    id,
+    title,
+    author,
+    description,
+    imageUrl,
+    userOwned
+  }: {
+    id: number,
+    title: string,
+    author: string,
+    description: string,
+    imageUrl: string,
+    userOwned?: boolean
+  }
 ) => {
+  const [modaVisible, setModalVisible] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
   return (
     <Container
       className="item_card"
@@ -33,10 +42,25 @@ export const ItemCard = (
       }}
       footer={
         <Box>
-            <Button>Add to Owned Books</Button>
+          {!userOwned ?
+            <Button>Add to Owned</Button>
+            : <Button
+              onClick={async () => {
+                setModalVisible(true);
+              }}
+            >Remove Book</Button>
+          }
         </Box>
       }
     >
+      <RemoveOwnedBookModal 
+        id={id} 
+        title={title}
+        visible={modaVisible} 
+        setVisible={setModalVisible} 
+        loading={loading} 
+        setLoading={setLoading} 
+      />
       <SpaceBetween direction="vertical" size="xxs">
         <SpaceBetween direction="vertical" size="xxs">
           <Box variant="h2">

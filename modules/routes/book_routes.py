@@ -55,25 +55,30 @@ def getAllBooks():
 
 @book_bp.route("/api/user_books", methods=["GET"])
 @token_required
-def getUserBooks(current_user, isAuthed):
+def getUserBooks(current_user, session, isAuthed):
     if not (isAuthed):
         return jsonify({'isAuthed': isAuthed, 'books': json.dumps([])})
-    
-    session = datasource.initDatasource()
 
     search_query = request.args.get('query', '').strip()
     offset, page_size = paginateBooks(request)
 
-    owned_books_query = session.query(datasource.OwnedBook).filter(
-            datasource.OwnedBook.user_id == current_user.username,
-            or_(
-                datasource.Book.title.ilike(f"%{search_query}%"),
-                datasource.Book.author.ilike(f"%{search_query}%")
-            )
-     ).join(datasource.Book)
-    
-    books = owned_books_query.offset(offset).limit(page_size).all()
-    total_books = owned_books_query.count()
+    users_books_ids = session.query(datasource.OwnedBook.book_id).filter(
+        datasource.OwnedBook.user_id == current_user.username,
+        datasource.OwnedBook.removed == False 
+    ).all()
+
+    books_query = session.query(
+        datasource.Book
+    ).filter(
+        datasource.Book.id.in_([id[0] for id in users_books_ids]),
+        or_(
+            datasource.Book.title.ilike(f"%{search_query}%"),
+            datasource.Book.author.ilike(f"%{search_query}%")
+        )
+    )
+
+    books = books_query.offset(offset).limit(page_size).all()
+    total_books = books_query.count()
 
     session.close()
 
@@ -89,6 +94,33 @@ def getUserBooks(current_user, isAuthed):
         'pagination': json.dumps(pagination),
         'isAuthed': True
     })
+
+@book_bp.route("/api/remove_user_book", methods=["POST"])
+@token_required
+def remove_user_book(current_user, session, isAuthed):
+    if not (isAuthed):
+        return jsonify({'isAuthed': isAuthed, 'success': False})
+    
+    try:
+        data = request.json
+        owned_book = session.query(datasource.OwnedBook).filter_by(user_id=current_user.username, book_id=data["title_id"]).first()
+    
+        if not owned_book:
+            return jsonify({'isAuthed': isAuthed, 'success': False})
+    
+        owned_book.removed = True
+        session.commit()
+    except Exception as e:
+        session.rollback()  # Rollback in case of an error
+        return {'error': str(e)}, 500
+    finally:
+        session.close()
+        return jsonify({'isAuthed': isAuthed, 'success': True})
+
+
+
+    
+
 
 
     

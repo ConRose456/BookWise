@@ -6,9 +6,10 @@ import { BookItemListView, getDefaultSearchValue } from "../common_components/bo
 import { ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 import { SignUpContext } from "../controllers/SignUpContext";
-import { useNavigate } from "react-router-dom";
 
 const PAGE_MAX_SIZE = 21;
+
+const PAGE_URL = "#/owned_books";
 
 export const OwnedBooks = () => {
     const { setShouldSignUp } = useContext(SignUpContext);
@@ -30,8 +31,9 @@ export const OwnedBooks = () => {
         currentPage: number,
     ) => {
         setItems([]);
+        const page = currentPage > 0 ? currentPage : 1;
         await fetch(
-            `/api/user_books?page=${currentPage}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
+            `/api/user_books?page=${page}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
             {
                 method: "GET",
                 headers: {
@@ -44,9 +46,9 @@ export const OwnedBooks = () => {
             .then(response => response.json())
             .then(({ books, pagination, isAuthed }) => {
                 if (isAuthed) {
-                    const parsedPagination = pagination ?? undefined;
+                    const paginationData = pagination ?? undefined;
                     setItems(JSON.parse(books));
-                    setPageCount(JSON.parse(parsedPagination)?.total_pages ?? 1);
+                    setPageCount(JSON.parse(paginationData)?.total_pages ?? 1);
                 } else {
                     setShouldSignUp(true);
                 }
@@ -84,7 +86,7 @@ export const OwnedBooks = () => {
                 className='search_input'
               />
             </SpaceBetween>
-            <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet} fetchContentCallBack={fetchBooks} />
+            <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet} fetchContentCallBack={fetchBooks} pageUrl={PAGE_URL} userOwned={true} />
           </ContentLayout>
     </div>
     );

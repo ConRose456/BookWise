@@ -20,11 +20,10 @@ def token_required(f):
         try:
             data = jwt.decode(token, key=SECRET_KEY, algorithms=['HS256'])
             current_user = session.query(datasource.User).filter_by(username=data["user_username"]).first()
-            session.close()
         except jwt.ExpiredSignatureError:
             return jsonify({'isAuthed': False})
         except jwt.InvalidTokenError:
             return jsonify({'isAuthed': False})
         
-        return f(current_user, isAuthed=True, *args, **kwargs)
+        return f(current_user, session, isAuthed=True, *args, **kwargs)
     return decorated

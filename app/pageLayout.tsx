@@ -84,9 +84,10 @@ export default function PageLayout() {
                     }}
                     items={[
                         { type: 'link', text: `Home`, href: `#` },
-                        { type: 'link', text: `Owned Books`, href: `#/owned_books` },
+                        { type: 'link', text: `Owned Books`, href: `#/owned_books`},
                         { type: 'link', text: `My Account`, href: `#` },
-                    ]} />}
+                    ]} />
+                }
                 content={<div>
                     <LoginModal
                         visible={isLoginVisible}

@@ -1,7 +1,7 @@
 import React from "react";
 import { Home } from "./pages/home";
 import { OwnedBooks } from "./pages/ownedBooks";
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 export default function PageRoute() {
     return (

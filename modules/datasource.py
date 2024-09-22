@@ -21,7 +21,7 @@ class User(Base):
     username = Column(String, primary_key=True)
     password = Column(String)
 
-    is_admin = Column(Boolean)
+    is_admin = Column(Boolean, default=False)
 
     first_name = Column(String)
     second_name = Column(String)
@@ -60,9 +60,13 @@ class OwnedBook(Base):
     id = Column(Integer, primary_key=True)
     book_id = Column(Integer, ForeignKey('books.id'))
     user_id = Column(String, ForeignKey('users.username'))
+    removed = Column(Boolean, default=False)
     
     user = relationship('User', back_populates='owned_books')
     book = relationship('Book')
+
+    def to_ids(self):
+        return self.id
 
 class Collection(Base):
     __tablename__ = 'collections'

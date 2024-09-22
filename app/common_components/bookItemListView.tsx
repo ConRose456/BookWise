@@ -14,11 +14,15 @@ export const BookItemListView = (
     { 
         searchQueryValue, 
         defaultsSet, 
-        fetchContentCallBack 
+        fetchContentCallBack,
+        pageUrl,
+        userOwned
     } : { 
         searchQueryValue: string, 
         defaultsSet: boolean, 
-        fetchContentCallBack: (...args: any) => void 
+        fetchContentCallBack: (...args: any) => void,
+        pageUrl?: string,
+        userOwned?: boolean
     }
 ) => {
     const [pageCount, setPageCount] = useState(1);
@@ -26,7 +30,7 @@ export const BookItemListView = (
 
     const [items, setItems] = useState<any[]>();
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setPageCount(getDefaultPageCount() ?? 1);
@@ -34,14 +38,14 @@ export const BookItemListView = (
     }, []);
 
     useEffect(() => {
-        setLoading(true);
         if (defaultsSet) {
+            setLoading(true);
             fetchContentCallBack(
                 setItems, 
                 setPageCount,
                 currentPage,
             );
-            savePageData(searchQueryValue, currentPage, pageCount);
+            savePageData(searchQueryValue, currentPage, pageCount, pageUrl);
             setLoading(false);
         }
     }, [currentPage, searchQueryValue, defaultsSet]);
@@ -54,7 +58,7 @@ export const BookItemListView = (
             <SpaceBetween direction="vertical" size="xl">
                 {
                     !loading
-                        ? <ItemCardGrid items={items} />
+                        ? <ItemCardGrid items={items} userOwned={userOwned}/>
                         : <Box textAlign="center">
                             <Spinner size="large" />
                         </Box>
@@ -82,13 +86,13 @@ const getDefaultPageCount = (): number | undefined => {
     return Number(urlParams.get("pageCount"));
 }
 
-const savePageData = (searchQueryValue: string, currentPage: number, pageCount: number) => {
+const savePageData = (searchQueryValue: string, currentPage: number, pageCount: number, pageUrl?: string) => {
     if (typeof window !== "undefined") {
         window.history.pushState(
             {},
             "",
-            `${window.location.origin}/?${new URLSearchParams({
-                search: searchQueryValue,
+            `${window.location.origin}${pageUrl ?? ""}/?${new URLSearchParams({
+                search: searchQueryValue ?? "",
                 currentPage: `${currentPage > 0 ? currentPage : 1}`,
                 pageCount: `${pageCount > 0 ? pageCount : 1}`
             })}`,
