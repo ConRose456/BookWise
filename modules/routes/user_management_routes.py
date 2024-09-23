@@ -43,4 +43,30 @@ def getAllUsers(current_user, session, isAuthed):
     finally:
         session.close()
 
+@user_management_bp.route('/api/delete_user', methods=["POST"])
+@token_required
+def deleteUser(current_user, session, isAuthed):
+    if not isAuthed or not current_user.is_admin:  # Check if user is authenticated and an admin
+        return jsonify({'isAuthed': isAuthed, 'success': False }), 403
+    
+    try:
+        # Get the username from the request body
+        data = request.json
+        user_to_delete = data.get('username')
+        
+        # Query the user to delete
+        user_to_delete = session.query(datasource.User).filter_by(username=user_to_delete).first()
 
+        if not user_to_delete:
+            return jsonify({'success': False, 'isAuthed': True, 'error': "User does not exist" }), 404
+        
+        # Delete the user
+        session.delete(user_to_delete)
+        session.commit()
+        
+        return jsonify({'success': True, 'isAuthed': True})
+    except Exception as e:
+        session.rollback()  # Rollback in case of an error
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        session.close()
