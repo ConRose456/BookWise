@@ -1,6 +1,6 @@
 import { Button, ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
 import React from "react";
-import { BookItemListView, getDefaultSearchValue } from "../common_components/bookItemListView";
+import { BookItemListView, getDefaultSearchValue } from "../common_components/book_list_components/bookItemListView";
 import { useState } from "react";
 import { useEffect } from "react";
 import { ContributeBookModal } from "../common_components/contribute_components/bookContributionModal";

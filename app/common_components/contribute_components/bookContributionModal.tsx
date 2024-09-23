@@ -3,7 +3,7 @@ import { Box, Button, FileUpload, FormField, Header, Input, Modal, SpaceBetween,
 import { contributeBook } from "@/app/helpers/contributeBookForm";
 import { validateBookInputs } from "@/app/helpers/validateBookInputs";
 import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
-import { SignUpContext } from "@/app/controllers/SignUpContext";
+import { SignUpContext } from "@/app/controllers/SignUpController";
 import { ErrorContributeBookModal } from "./contributeErrorModal";
 export const ContributeBookModal = (
     {

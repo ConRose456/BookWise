@@ -4,9 +4,9 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import Box from "@cloudscape-design/components/box";
 import Link from "@cloudscape-design/components/link";
 import Button from "@cloudscape-design/components/button";
-import { RemoveOwnedBookModal } from "./removeOwnedBookModal";
-import { addOwnedBook } from "../helpers/userAddOwnedBook";
-import { UserOwnsBookModal } from "./userOwnsBookModal";
+import { RemoveOwnedBookModal } from "../owned_book_components/removeOwnedBookModal";
+import { addOwnedBook } from "../../helpers/userAddOwnedBook";
+import { UserOwnsBookModal } from "../owned_book_components/userOwnsBookModal";
 
 export const ItemCard = (
   {

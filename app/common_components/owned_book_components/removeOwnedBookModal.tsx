@@ -1,5 +1,5 @@
 import { Box, Button, Modal, SpaceBetween } from "@cloudscape-design/components";
-import { removeOwnedBook } from "../helpers/userRemoveOwnedBook";
+import { removeOwnedBook } from "../../helpers/userRemoveOwnedBook";
 import React, { useState } from "react";
 
 export const RemoveOwnedBookModal = (

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useEffect, useState } from "react";
-import { PaginateItemCardGrid } from "./pagination";
+import { PaginateItemCardGrid } from "../pagination";
 import { ItemCardGrid } from "./item_card_grid";
 import { Box, SpaceBetween, Spinner } from "@cloudscape-design/components";
 

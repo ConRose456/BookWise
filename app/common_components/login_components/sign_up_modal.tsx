@@ -1,7 +1,7 @@
 import { Box, Button, FormField, Header, Input, Link, Modal, Popover, SpaceBetween } from "@cloudscape-design/components";
 import { useContext, useState } from "react";
-import { submitSignUpForm } from "../helpers/signUpForm";
-import { AuthTokenStateContext, AuthTokenStateController } from "../controllers/AuthTokenStateController";
+import { submitSignUpForm } from "../../helpers/signUpForm";
+import { AuthTokenStateContext, AuthTokenStateController } from "../../controllers/AuthTokenStateController";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 

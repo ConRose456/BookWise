@@ -7,12 +7,12 @@ import {
 } from '@cloudscape-design/components';
 import "./globals.css";
 import React, { useContext } from 'react';
-import { LoginModal } from './common_components/login_modal';
-import { SignUpModal } from './common_components/sign_up_modal';
+import { LoginModal } from './common_components/login_components/login_modal';
+import { SignUpModal } from './common_components/login_components/sign_up_modal';
 import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdown/interfaces';
 import { useEffect } from 'react';
-import { SignUpContext } from './controllers/SignUpContext';
+import { SignUpContext } from './controllers/SignUpController';
 import dynamic from 'next/dynamic';
 import { HashRouter, useNavigate } from 'react-router-dom';
 

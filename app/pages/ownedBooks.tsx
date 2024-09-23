@@ -2,10 +2,10 @@
 
 import React, { useContext, useEffect } from "react";
 import { useState } from "react";
-import { BookItemListView, getDefaultSearchValue } from "../common_components/bookItemListView";
+import { BookItemListView, getDefaultSearchValue } from "../common_components/book_list_components/bookItemListView";
 import { ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
-import { SignUpContext } from "../controllers/SignUpContext";
+import { SignUpContext } from "../controllers/SignUpController";
 
 const PAGE_MAX_SIZE = 21;
 

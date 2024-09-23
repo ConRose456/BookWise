@@ -5,7 +5,7 @@ import React from 'react';
 import { AuthTokenStateContext, AuthTokenStateController } from './controllers/AuthTokenStateController';
 import { useEffect } from 'react';
 
-import { SignUpContext } from './controllers/SignUpContext';
+import { SignUpContext } from './controllers/SignUpController';
 import dynamic from 'next/dynamic';
 
 if (typeof window === "undefined") React.useLayoutEffect = () => { };
