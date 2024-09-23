@@ -38,16 +38,19 @@ export const BookItemListView = (
     }, []);
 
     useEffect(() => {
-        if (defaultsSet) {
-            setLoading(true);
-            fetchContentCallBack(
-                setItems, 
-                setPageCount,
-                currentPage,
-            );
-            savePageData(searchQueryValue, currentPage, pageCount, pageUrl);
+        const fetchData = async () => {
+            if (defaultsSet) {
+                setLoading(true);
+                await fetchContentCallBack(
+                    setItems, 
+                    setPageCount,
+                    currentPage,
+                );
+                savePageData(searchQueryValue, currentPage, pageCount, pageUrl);
+            }
             setLoading(false);
         }
+        fetchData();
     }, [currentPage, searchQueryValue, defaultsSet]);
 
     return (
@@ -61,7 +64,7 @@ export const BookItemListView = (
                         ? ((items?.length ?? 0) > 0
                             ? <ItemCardGrid items={items} userOwned={userOwned}/>
                             : <Box className="empty_list" textAlign="center"><b>No Books in your collection</b></Box>)
-                        : <Box textAlign="center">
+                        : <Box className="empty_list" textAlign="center">
                             <Spinner size="large" />
                         </Box>
                 }
