@@ -83,7 +83,7 @@ def getUserBooks(current_user, session, isAuthed):
     session.close()
 
     if not books:
-        return jsonify({'books': json.dumps([]), 'isAuthed': True, 'errors': 'failed_books_fetch'})
+        return jsonify({'books': json.dumps([]), 'isAuthed': True, 'error': 'failed_books_fetch'})
     
     pagination = {
         'total_pages': (total_books + page_size - 1) // page_size

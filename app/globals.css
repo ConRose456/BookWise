@@ -21,6 +21,10 @@ main {
   display: flex;
 }
 
+.empty_list {
+  padding-top: 3%;
+}
+
 .user_table {
   padding-left: 3%;
 }

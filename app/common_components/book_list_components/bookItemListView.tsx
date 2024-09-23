@@ -58,7 +58,9 @@ export const BookItemListView = (
             <SpaceBetween direction="vertical" size="xl">
                 {
                     !loading
-                        ? <ItemCardGrid items={items} userOwned={userOwned}/>
+                        ? ((items?.length ?? 0) > 0
+                            ? <ItemCardGrid items={items} userOwned={userOwned}/>
+                            : <Box className="empty_list" textAlign="center"><b>No Books in your collection</b></Box>)
                         : <Box textAlign="center">
                             <Spinner size="large" />
                         </Box>

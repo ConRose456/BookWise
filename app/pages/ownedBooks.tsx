@@ -44,11 +44,14 @@ export const OwnedBooks = () => {
             }
         )
             .then(response => response.json())
-            .then(({ books, pagination, isAuthed }) => {
+            .then(({ books=JSON.stringify([]), pagination=JSON.stringify(""), isAuthed, error }) => {
                 if (isAuthed) {
-                    const paginationData = pagination ?? undefined;
-                    setItems(JSON.parse(books));
-                    setPageCount(JSON.parse(paginationData)?.total_pages ?? 1);
+                    const paginationData = JSON.parse(pagination) ?? {};
+                    const bookData = JSON.parse(books) ?? []
+                    setItems(bookData);
+                    setPageCount(paginationData.total_pages ?? 1);
+                } else if (error) {
+                    console.error(error)
                 } else {
                     setShouldSignUp(true);
                 }
