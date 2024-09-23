@@ -7,7 +7,8 @@ main {
 }
 
 .header {
-  margin-left: 3%;
+  padding-left: 3%;
+  padding-right: 3%
 }
 
 .search_input {
@@ -21,8 +22,8 @@ main {
 }
 
 .items_grid {
-  margin-left: 3%;
-  margin-top: 3%;
+  padding-left: 3%;
+  padding-top: 3%;
 }
 
 .pagination {
