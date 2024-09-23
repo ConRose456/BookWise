@@ -16,7 +16,7 @@ export const ContributeBookModal = (
 ) => {
     const { setShouldSignUp } = useContext(SignUpContext);
 
-    const [errorModalVisible, setErrorModalVisible] = useState(true);
+    const [errorModalVisible, setErrorModalVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     const [isbn, setIsbn] = useState("");
