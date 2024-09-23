@@ -18,6 +18,18 @@ export class AuthTokenStateController {
         return true;
     }
 
+    public static isAdmin = () => {
+        const token = this.getAuthToken()
+        if (this.isAuthorized() && token) {
+            const decodedToken = jwtDecode(token) as any;
+            if (decodedToken.is_admin) {
+                return true;
+            }
+            return false;
+        }   
+        return false;
+    }
+
     private static isAuthTokenExp = () => {
         const token = this.getAuthToken();
         if (token) {

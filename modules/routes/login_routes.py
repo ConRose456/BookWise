@@ -27,7 +27,8 @@ def login_user(username, password, session):
     if (user and check_hashed_password(user.password, password)):
         payload = {
             "user_username": user.username,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+            "is_admin": user.is_admin
         }
         token = jwt.encode(payload, key=SECRET_KEY, algorithm='HS256')
         return jsonify({'userText': user.username,'token': json.dumps(token)})

@@ -98,10 +98,13 @@ export default function PageLayout() {
                         href: '#',
                         text: 'Book Wise',
                     }}
-                    items={[
+                    items={AuthTokenStateController.isAdmin() ? [
                         { type: 'link', text: `Home`, href: `#` },
                         { type: 'link', text: `Owned Books`, href: `#/owned_books`},
-                        { type: 'link', text: `My Account`, href: `#` },
+                        { type: 'link', text: `Manage Users`, href: `#/manage_users` },
+                    ]: [
+                        { type: 'link', text: `Home`, href: `#` },
+                        { type: 'link', text: `Owned Books`, href: `#/owned_books`},
                     ]} />
                 }
                 content={<div>

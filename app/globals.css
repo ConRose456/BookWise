@@ -21,6 +21,10 @@ main {
   display: flex;
 }
 
+.user_table {
+  padding-left: 3%;
+}
+
 .items_grid {
   padding-left: 3%;
   padding-top: 3%;
