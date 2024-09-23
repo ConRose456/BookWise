@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Box, Button, ContentLayout, Header, SpaceBetween, StatusIndicator, Table, TextFilter } from "@cloudscape-design/components";
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 import { DeleteUserModal } from "../common_components/manage_users_component/deleteUserModal";
 
 export default function ManageUsers() {
     const [items, setItems] = useState<any[]>([]);
+    const [filteredItems, setFilteredItems] = useState<any[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
+    const [filterText, setFilterText] = useState("");
 
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
+    // Clears URL args on page change
     useEffect(() => {
         window.history.pushState(
             {},
@@ -18,6 +22,17 @@ export default function ManageUsers() {
         );
     });
 
+    // Filters users by the text in search bar of table
+    useEffect(() => { 
+        if (filterText.length > 0) {
+            const regex = new RegExp(filterText, 'i');
+            setFilteredItems([...items].filter((item) => regex.test(item.username)))
+        } else {
+            setFilteredItems(items);
+        }
+    }, [filterText])
+
+    // fetch user data on page load
     useEffect(() => {
         const fetchData = async () => {
             return await fetch(
@@ -36,6 +51,7 @@ export default function ManageUsers() {
                         window.location.href = "/forbidden";
                     } else {
                         setItems(data.data);
+                        setFilteredItems(data.data);
                     }
                     setLoading(false);
                 });
@@ -84,7 +100,8 @@ export default function ManageUsers() {
                             filter={
                                 <TextFilter
                                     filteringPlaceholder="Find Users"
-                                    filteringText=""
+                                    filteringText={filterText}
+                                    onChange={({detail}) => setFilterText(detail.filteringText)}
                                 />
                             }
                             empty={
@@ -99,7 +116,7 @@ export default function ManageUsers() {
                                 </Box>
                             }
                             loadingText="Loading Users"
-                            items={items}
+                            items={filteredItems}
                             selectionType="single"
                             selectedItems={selectedItems}
                             onSelectionChange={({detail}) => {
