@@ -99,6 +99,7 @@ export const SignUpModal = (
                                     authTokenStateController.setIsAuthorised(
                                         AuthTokenStateController.isAuthorized()
                                     );
+                                    window.location.reload()
                                 }
                                 setLoading(false);
                             }}

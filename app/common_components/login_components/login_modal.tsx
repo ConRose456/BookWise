@@ -68,6 +68,7 @@ export const LoginModal = (
                                     authTokenStateController.setIsAuthorised(
                                         AuthTokenStateController.isAuthorized()
                                     );
+                                    window.location.reload()
                                 }
                                 setLoading(false);
                             }}>Login</Button>
