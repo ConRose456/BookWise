@@ -4,6 +4,7 @@ import { contributeBook } from "@/app/helpers/contributeBookForm";
 import { validateBookInputs } from "@/app/helpers/validateBookInputs";
 import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
 import { SignUpContext } from "@/app/controllers/SignUpContext";
+import { ErrorContributeBookModal } from "./contributeErrorModal";
 export const ContributeBookModal = (
     {
         visible,
@@ -14,6 +15,9 @@ export const ContributeBookModal = (
     }
 ) => {
     const { setShouldSignUp } = useContext(SignUpContext);
+
+    const [errorModalVisible, setErrorModalVisible] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const [isbn, setIsbn] = useState("");
     const [title, setTitle] = useState("");
@@ -76,8 +80,11 @@ export const ContributeBookModal = (
                                             imageUrl: ""
                                         }).then(response => {
                                             if (response.success) {
-                                                // modal pop up created successfully
+                                                window.location.reload();
                                                 setVisible(false);
+                                            } else {
+                                                setErrorMessage(response.message ?? "Uknown error");
+                                                setErrorModalVisible(true);
                                             }
                                         });
                                     }
@@ -90,6 +97,11 @@ export const ContributeBookModal = (
                     </Box>
                 }
             >
+                <ErrorContributeBookModal 
+                    visible={errorModalVisible} 
+                    setVisible={setErrorModalVisible} 
+                    message={errorMessage} 
+                />
                 <SpaceBetween direction="vertical" size="l">
                     <FormField 
                         label="ISBN"
