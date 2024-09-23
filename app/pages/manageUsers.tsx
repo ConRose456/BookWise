@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, ContentLayout, Header, SpaceBetween, StatusIndicator, Table, TextFilter } from "@cloudscape-design/components";
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
+import { DeleteUserModal } from "../common_components/manage_users_component/deleteUserModal";
 
 export default function ManageUsers() {
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
+
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
     useEffect(() => {
         window.history.pushState(
@@ -55,6 +58,7 @@ export default function ManageUsers() {
                     </Header>
                 }
             >
+                <DeleteUserModal visible={deleteModalVisible} setVisible={setDeleteModalVisible} username={selectedItems[0]?.username ?? ""} />
                 <div className="user_table">
                     <SpaceBetween direction='vertical' size='l'>
                         <Table
@@ -63,7 +67,14 @@ export default function ManageUsers() {
                                 <Header
                                     actions={
                                         <Box float="right">
-                                            <Button variant="primary">Delete User</Button>
+                                            <Button 
+                                                variant="primary"
+                                                onClick={() => {
+                                                    setDeleteModalVisible(true);
+                                                }}
+                                            >
+                                                Delete User
+                                            </Button>
                                         </Box>
                                     }
                                 >
