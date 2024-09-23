@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, FileUpload, FormField, Header, Input, Modal, SpaceBetween, Textarea } from "@cloudscape-design/components";
-
+import { contributeBook } from "@/app/helpers/contributeBookForm";
+import { validateBookInputs } from "@/app/helpers/validateBookInputs";
+import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
+import { SignUpContext } from "@/app/controllers/SignUpContext";
 export const ContributeBookModal = (
     {
         visible,
@@ -10,10 +13,34 @@ export const ContributeBookModal = (
         setVisible: (value: boolean) => void
     }
 ) => {
+    const { setShouldSignUp } = useContext(SignUpContext);
+
     const [isbn, setIsbn] = useState("");
     const [title, setTitle] = useState("");
     const [author, setAuthor] = useState("");
     const [description, setDescription] = useState("");
+
+    const [loading, setLoading] = useState(false);
+
+    const [validInputs, setValidInputs] = useState<string[]>();
+
+    // Ensure user is Authed
+    useEffect(() => {
+        if (visible) {
+            if (!AuthTokenStateController.isAuthorized()) {
+                setVisible(false);
+                setShouldSignUp(true);
+            }
+        }
+    }, [visible]);
+
+    useEffect(() => {
+        setIsbn("");
+        setTitle("");
+        setAuthor("");
+        setDescription("");
+        setValidInputs([]);
+    }, [visible]);
 
     return (
         <div>
@@ -28,36 +55,90 @@ export const ContributeBookModal = (
                 footer={
                     <Box float="right">
                         <SpaceBetween direction="horizontal" size="xs">
-                            <Button>Cancel</Button>
-                            <Button variant="primary">Submit</Button>
+                            <Button onClick={() => setVisible(false)}>Cancel</Button>
+                            <Button 
+                                loading={loading}
+                                variant="primary"
+                                onClick={async() => {
+                                    setLoading(true);
+                                    setValidInputs(validateBookInputs({
+                                        isbn,
+                                        title,
+                                        author,
+                                        description
+                                    }));
+                                    if (!validInputs) {
+                                        await contributeBook({
+                                            isbn,
+                                            title,
+                                            author,
+                                            description,
+                                            imageUrl: ""
+                                        }).then(response => {
+                                            if (response.success) {
+                                                // modal pop up created successfully
+                                                setVisible(false);
+                                            }
+                                        });
+                                    }
+                                    setLoading(false);
+                                }}
+                            >
+                                Submit
+                            </Button>
                         </SpaceBetween>
                     </Box>
                 }
             >
                 <SpaceBetween direction="vertical" size="l">
-                    <FormField label="ISBN">
-                        <Input placeholder="Enter ISBN" value={isbn} onChange={({detail}) => setIsbn(detail.value.replace(" ", ""))}/>
+                    <FormField 
+                        label="ISBN"
+                        description="Enter the Books unique ISBN number."
+                        errorText={ validInputs?.includes("isbn") ? "You must enter an ISBN." : ""}
+                    >
+                        <Input 
+                            placeholder="Enter ISBN" 
+                            value={isbn} 
+                            onChange={({detail}) => setIsbn(detail.value.replace(" ", ""))}
+                        />
                     </FormField>
-
-                    <FormField label="Title">
-                        <Input placeholder="Enter book title" value={title} onChange={({detail}) => setTitle(detail.value)} />
+                    <FormField 
+                        label="Title"
+                        description="Enter the books title."
+                        errorText={ validInputs?.includes("title") ? "You must enter a title." : ""}
+                    >
+                        <Input 
+                            placeholder="Enter book title" 
+                            value={title} 
+                            onChange={({detail}) => setTitle(detail.value)} 
+                        />
                     </FormField>
-
-                    <FormField label="Author">
-                        <Input placeholder="Enter author's name" value={author} onChange={({detail}) => setAuthor(detail.value)} />
+                    <FormField 
+                        label="Author"
+                        description="Enter the author of the book."
+                        errorText={ validInputs?.includes("author") ? "You must enter an author." : ""}
+                    >
+                        <Input 
+                            placeholder="Enter author's name" 
+                            value={author} 
+                            onChange={({detail}) => setAuthor(detail.value)} 
+                        />
                     </FormField>
-
-                    <FormField label="Description">
+                    <FormField 
+                        label="Description"
+                        description="Enter a description of the book or the books blurb"
+                        errorText={ validInputs?.includes("description") ? "You must enter a description." : ""}
+                    >
                         <Textarea
                             onChange={({detail}) => setDescription(detail.value)}
                             value={description}
-                            placeholder="This is a placeholder"
+                            placeholder="Book description..."
                         />
                     </FormField>
 
                     <FormField
-                        label="Form field label"
-                        description="Description"
+                        label="Book Cover Image"
+                        description="Upload a photo of the books cover."
                     >
                         <FileUpload
                             onChange={() => {}}
@@ -82,3 +163,4 @@ export const ContributeBookModal = (
         </div>
     );
 }
+

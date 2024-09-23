@@ -1,4 +1,4 @@
-import { Box, Button, ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
+import { Button, ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
 import React from "react";
 import { BookItemListView, getDefaultSearchValue } from "../common_components/bookItemListView";
 import { useState } from "react";
