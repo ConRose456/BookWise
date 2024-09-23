@@ -95,6 +95,40 @@ def getUserBooks(current_user, session, isAuthed):
         'isAuthed': True
     })
 
+@book_bp.route("/api/contribute_book", methods=["POST"])
+@token_required
+def contribute_book(current_user, session, isAuthed):
+    if not (isAuthed):
+        return jsonify({'isAuthed': isAuthed, 'success': False})
+    
+    data = request.json
+
+    # Check if the book with the given ISBN already exists
+    existing_book = session.query(datasource.Book).filter_by(isbn=data["isbn"]).first()
+
+    if existing_book:
+        return {"success": False, "message": "Book with this ISBN already exists."}
+
+    # Add the new book
+    new_book = datasource.Book(
+        isbn=data["isbn"],
+        title=data["title"],
+        author=data["author"],
+        description=data["description"],
+        image_url=data["imageUrl"]
+    )
+
+    try:
+        session.add(new_book)
+        session.commit()
+    except Exception as e:
+        session.rollback()  # Rollback in case of an error
+        return {"success": False, "message": f"Error adding book: {str(e)}"}
+    finally:
+        print(f"Book Contributed: {current_user} added {json.dumps(new_book.to_dict())}")
+        session.close()
+        return {"success": True, "message": "Book added successfully."}
+
 @book_bp.route("/api/add_owned_book", methods=["POST"])
 @token_required
 def add_owned_book(current_user, session, isAuthed):
