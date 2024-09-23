@@ -4,7 +4,6 @@ import datetime
 import modules.datasource as datasource
 import jwt
 import json
-import sqlalchemy as db
 import bcrypt
 import os
 
