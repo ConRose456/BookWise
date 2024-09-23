@@ -5,7 +5,7 @@ import { AuthTokenStateController } from "../controllers/AuthTokenStateControlle
 export default function ManageUsers() {
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedItem, setSelectedItem] = useState("");
+    const [selectedItems, setSelectedItems] = useState<any[]>([]);
 
     useEffect(() => {
         window.history.pushState(
@@ -42,7 +42,6 @@ export default function ManageUsers() {
 
     return (
         <div>
-
             <ContentLayout
                 defaultPadding
                 headerVariant="high-contrast"
@@ -91,6 +90,10 @@ export default function ManageUsers() {
                             loadingText="Loading Users"
                             items={items}
                             selectionType="single"
+                            selectedItems={selectedItems}
+                            onSelectionChange={({detail}) => {
+                                setSelectedItems(detail.selectedItems);
+                            }}
                             columnDefinitions={[
                                 {
                                     id: "username",
