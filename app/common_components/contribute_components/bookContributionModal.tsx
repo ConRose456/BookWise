@@ -39,7 +39,7 @@ export const ContributeBookModal = (
         setTitle("");
         setAuthor("");
         setDescription("");
-        setValidInputs([]);
+        setValidInputs(undefined);
     }, [visible]);
 
     return (

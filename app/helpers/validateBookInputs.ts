@@ -20,9 +20,8 @@ export const validateBookInputs = (
         ["description", description]
     ])
 
-    const foo = fieldsEmpty(fields);
-    console.log(JSON.stringify(foo, null, 2));
-    return foo;
+    const invalidInputs = fieldsEmpty(fields);
+    return invalidInputs.length > 0 ? invalidInputs : undefined;
 }
 
 const fieldsEmpty = (fields: Map<string, string | undefined>): string[] => {
