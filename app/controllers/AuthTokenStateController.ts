@@ -18,6 +18,7 @@ export class AuthTokenStateController {
         return true;
     }
 
+    // Will ensure user is admin authed though there token on client side for UI differnces
     public static isAdmin = () => {
         const token = this.getAuthToken()
         if (this.isAuthorized() && token) {
@@ -28,6 +29,33 @@ export class AuthTokenStateController {
             return false;
         }   
         return false;
+    }
+
+    // This will check if user is admin authed by server before rendering admin pages and fetching admin data
+    public static isAdminAuthedByServer = async () => {
+        return await fetch(
+            "/api/is_admin",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": 'application/json',
+                    "charset": 'UTF-8',
+                    "Authorization": `Bearer ${AuthTokenStateController.getAuthToken()}`
+                }
+            }
+        ).then(reponse => reponse.json())
+        .then(data => {
+            if (!data.isAuthed) {
+                window.location.href = "/forbidden";
+                return false;
+            } else {
+                return true;
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            return false;
+        });
     }
 
     private static isAuthTokenExp = () => {

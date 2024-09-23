@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
-import { Box, Button, ContentLayout, Header, SpaceBetween, Table, TextFilter } from "@cloudscape-design/components";
+import React, { useEffect, useState } from "react";
+import { Box, Button, ContentLayout, Header, SpaceBetween, StatusIndicator, Table, TextFilter } from "@cloudscape-design/components";
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 
-export const ManageUsers = () => {
+export default function ManageUsers() {
+    const [items, setItems] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedItem, setSelectedItem] = useState("");
+
     useEffect(() => {
-        if (!AuthTokenStateController.isAdmin()) {
-            window.location.href = "/forbidden";
-        }
         window.history.pushState(
             {},
             "",
@@ -14,8 +15,34 @@ export const ManageUsers = () => {
         );
     });
 
+    useEffect(() => {
+        const fetchData = async () => {
+            return await fetch(
+                "/api/users",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": 'application/json',
+                        "charset": 'UTF-8',
+                        "Authorization": `Bearer ${AuthTokenStateController.getAuthToken()}`
+                    }
+                }
+            ).then(response => response.json())
+                .then(data => {
+                    if (data.status === 403) {
+                        window.location.href = "/forbidden";
+                    } else {
+                        setItems(data.data);
+                    }
+                    setLoading(false);
+                });
+        }
+        fetchData();
+    }, [])
+
     return (
         <div>
+
             <ContentLayout
                 defaultPadding
                 headerVariant="high-contrast"
@@ -32,6 +59,7 @@ export const ManageUsers = () => {
                 <div className="user_table">
                     <SpaceBetween direction='vertical' size='l'>
                         <Table
+                            loading={loading}
                             header={
                                 <Header
                                     actions={
@@ -61,27 +89,38 @@ export const ManageUsers = () => {
                                 </Box>
                             }
                             loadingText="Loading Users"
-                            items={[]}
+                            items={items}
+                            selectionType="single"
                             columnDefinitions={[
                                 {
                                     id: "username",
                                     header: "Username",
-                                    cell: item => item,
+                                    cell: e => e.username,
+                                    sortingField: "username"
                                 },
                                 {
                                     id: "fisrt_name",
                                     header: "First Name",
-                                    cell: item => item,
+                                    cell: e => e.first_name,
+                                    sortingField: "first_name"
                                 },
                                 {
                                     id: "second_name",
                                     header: "Second Name",
-                                    cell: item => item,
+                                    cell: e => e.second_name,
+                                    sortingField: "second_name"
                                 },
                                 {
                                     id: "is_admin",
                                     header: "Admin",
-                                    cell: item => item,
+                                    cell: e => (
+                                        <StatusIndicator
+                                            type={e.is_admin ? "success" : "error"}
+                                        >
+                                            {e.is_admin ? "TRUE" : "FALSE"}
+                                        </StatusIndicator>
+                                    ),
+                                    sortingField: "is_admin"
                                 }
                             ]}
                         />
