@@ -68,9 +68,7 @@ export const BookItemListView = (
                             <Spinner size="large" />
                         </Box>
                 }
-                <div className="pagination">
-                    <PaginateItemCardGrid pageCount={pageCount} />
-                </div>
+                <PaginateItemCardGrid pageCount={pageCount} />
             </SpaceBetween>
         </PaginationContext.Provider>
     );

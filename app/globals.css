@@ -29,9 +29,18 @@ main {
   padding-left: 3%;
 }
 
+.search_display {
+  padding-left: 3%;
+  padding-top: 2%;
+}
+
+.search_text {
+  color: darkblue;
+}
+
 .items_grid {
   padding-left: 3%;
-  padding-top: 3%;
+  padding-top: 1%;
 }
 
 .pagination {
@@ -39,4 +48,5 @@ main {
   display: flex;
   justify-content: center;
   align-items: center; 
+  margin-bottom: 1%;
 }

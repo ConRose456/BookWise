@@ -68,7 +68,7 @@ export default function ManageUsers() {
                     <Header
                         className='header'
                         variant="h1"
-                        description="Search the books you own!"
+                        description="Mange accounts for BookWise!"
                     >
                         Manage Users
                     </Header>
@@ -85,6 +85,7 @@ export default function ManageUsers() {
                                         <Box float="right">
                                             <Button 
                                                 variant="primary"
+                                                disabled={selectedItems?.length === 0}
                                                 onClick={() => {
                                                     setDeleteModalVisible(true);
                                                 }}

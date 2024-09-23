@@ -1,9 +1,10 @@
-import { Button, ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
+import { Box, Button, ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
 import React from "react";
 import { BookItemListView, getDefaultSearchValue } from "../common_components/book_list_components/bookItemListView";
 import { useState } from "react";
 import { useEffect } from "react";
 import { ContributeBookModal } from "../common_components/contribute_components/bookContributionModal";
+import { SearchDisplay } from "../common_components/searchDisplayComponent";
 
 const PAGE_MAX_SIZE = 21;
 
@@ -60,7 +61,7 @@ export const Home = () => {
                         info={<Link variant="info">Info</Link>}
                         description="Search for your favirate books!"
                         actions={
-                            <Button 
+                            <Button
                                 variant="primary"
                                 onClick={() => {
                                     setContributionModalVisible(true)
@@ -75,21 +76,20 @@ export const Home = () => {
                 }
             >
                 <ContributeBookModal visible={contributionModalVisible} setVisible={setContributionModalVisible} />
-                <SpaceBetween direction='vertical' size='l'>
-                    <Input
-                        onChange={({ detail }) => setSearchInputValue(detail.value)}
-                        value={searchInputValue}
-                        onKeyDown={({ detail }) => {
-                            if (detail.key == "Enter") {
-                                setSearchQueryValue(searchInputValue);
-                            }
-                        }}
-                        placeholder="Search"
-                        type="search"
-                        className='search_input'
-                    />
-                    <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet} fetchContentCallBack={fetchBooks} />
-                </SpaceBetween>
+                <Input
+                    onChange={({ detail }) => setSearchInputValue(detail.value)}
+                    value={searchInputValue}
+                    onKeyDown={({ detail }) => {
+                        if (detail.key == "Enter") {
+                            setSearchQueryValue(searchInputValue);
+                        }
+                    }}
+                    placeholder="Search"
+                    type="search"
+                    className='search_input'
+                />
+                <SearchDisplay searchQueryValue={searchQueryValue}/>
+                <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet} fetchContentCallBack={fetchBooks} />
             </ContentLayout>
         </div>
     );
