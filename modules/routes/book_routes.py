@@ -137,6 +137,38 @@ def contribute_book(current_user, session, isAuthed):
         print(f"Book Contributed: {current_user} added {json.dumps(new_book.to_dict())}")
         session.close()
         return {"success": True, "message": "Book added successfully."}
+    
+# Api endpoint to edit book 
+@book_bp.route("/api/edit_book", methods=["POST"])
+@token_required
+def edit_book(current_user, session, isAuthed):
+    if not (isAuthed):
+        return jsonify({'isAuthed': isAuthed, 'success': False})
+
+    # Upload image and retrieve image url
+    public_url = upload_image(request)
+
+    # Get Book to edit
+    existing_book = session.query(datasource.Book).filter_by(isbn=request.form.get("isbn")).first()
+
+    if not existing_book:
+        return {"success": False, "message": "Book with this ISBN do not exists."}
+
+    # edit the book
+    existing_book.title=request.form.get("title"),
+    existing_book.author=request.form.get("author"),
+    existing_book.description=request.form.get("description"),
+    existing_book.image_url=public_url
+
+    try:
+        session.add(existing_book)
+        session.commit()
+    except Exception as e:
+        session.rollback()  # Rollback in case of an error
+        return {"success": False, "message": f"Error adding book: {str(e)}"}
+    finally:
+        session.close()
+        return {"success": True, "message": "Book added successfully."}
 
 # Api endpoint to add user owned book
 @book_bp.route("/api/add_owned_book", methods=["POST"])
