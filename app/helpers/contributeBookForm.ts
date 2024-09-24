@@ -5,29 +5,30 @@ export const contributeBook = async ({
     title,
     author,
     description,
-    imageUrl
+    image
 }: {
     isbn: string,
     title: string,
     author: string,
     description: string,
-    imageUrl: string
+    image: File | undefined
 }) => {
+    const formData = new FormData();
+    formData.append('isbn', isbn);
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('description', description);
+    if (image) {
+        formData.append('image', image);
+    }
+
     return await fetch(
         "/api/contribute_book", {
             method: "POST",
             headers: {
-                "Content-Type": 'application/json',
-                "charset": 'UTF-8',
                 "Authorization": `Bearer ${AuthTokenStateController.getAuthToken()}`
             },
-            body: JSON.stringify({ 
-                isbn,
-                title,
-                author,
-                description,
-                imageUrl
-            })
+            body: formData
         }
     ).then(response => response.json())
     .catch(error => console.log(error));
