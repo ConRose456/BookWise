@@ -1,19 +1,11 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import or_
 from modules.auth import token_required
-from supabase import create_client, Client
-from werkzeug.utils import secure_filename
-
+from modules.utils.images import upload_image
 import modules.datasource as datasource
 import json
-import os
-import uuid
 
 book_bp = Blueprint('books', __name__)
-
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_KEY')
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # function getting offset and page size for pafinated book request
 def paginateBooks(request):
@@ -117,22 +109,8 @@ def contribute_book(current_user, session, isAuthed):
     if not (isAuthed):
         return jsonify({'isAuthed': isAuthed, 'success': False})
 
-    # Image shit
-    if 'image' in request.files:
-        image = request.files['image']
-        filename = image.filename
-        unique_filename = f"{uuid.uuid4()}_{filename}"
-    
-        file_content = image.read()
-
-        response = supabase.storage.from_('book_images').upload(unique_filename, file_content)
-
-        if response.status_code == 200:
-            public_url = supabase.storage.from_('book_images').get_public_url(unique_filename)
-        else:
-            public_url = ""
-    else:
-        public_url = ""
+    # Upload image and retrieve image url
+    public_url = upload_image(request)
 
     # Check if the book with the given ISBN already exists
     existing_book = session.query(datasource.Book).filter_by(isbn=request.form.get("isbn")).first()
