@@ -1,11 +1,19 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import or_
 from modules.auth import token_required
+from supabase import create_client, Client
+from werkzeug.utils import secure_filename
 
 import modules.datasource as datasource
 import json
+import os
+import uuid
 
 book_bp = Blueprint('books', __name__)
+
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def paginateBooks(request):
     try:
@@ -100,22 +108,37 @@ def getUserBooks(current_user, session, isAuthed):
 def contribute_book(current_user, session, isAuthed):
     if not (isAuthed):
         return jsonify({'isAuthed': isAuthed, 'success': False})
+
+    # Image shit
+    if 'image' in request.files:
+        image = request.files['image']
+        filename = image.filename
+        unique_filename = f"{uuid.uuid4()}_{filename}"
     
-    data = request.json
+        file_content = image.read()
+
+        response = supabase.storage.from_('book_images').upload(unique_filename, file_content)
+
+        if response.status_code == 200:
+            public_url = supabase.storage.from_('book_images').get_public_url(unique_filename)
+        else:
+            public_url = ""
+    else:
+        public_url = ""
 
     # Check if the book with the given ISBN already exists
-    existing_book = session.query(datasource.Book).filter_by(isbn=data["isbn"]).first()
+    existing_book = session.query(datasource.Book).filter_by(isbn=request.form.get("isbn")).first()
 
     if existing_book:
         return {"success": False, "message": "Book with this ISBN already exists."}
 
     # Add the new book
     new_book = datasource.Book(
-        isbn=data["isbn"],
-        title=data["title"],
-        author=data["author"],
-        description=data["description"],
-        image_url=data["imageUrl"]
+        isbn=request.form.get("isbn"),
+        title=request.form.get("title"),
+        author=request.form.get("author"),
+        description=request.form.get("description"),
+        image_url=public_url
     )
 
     try:
