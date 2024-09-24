@@ -8,6 +8,8 @@ import { RemoveOwnedBookModal } from "../owned_book_components/removeOwnedBookMo
 import { addOwnedBook } from "../../helpers/userAddOwnedBook";
 import { UserOwnsBookModal } from "../owned_book_components/userOwnsBookModal";
 
+const DEFAULT_BOOK_IMAGE_PATH = "/_next/static/media/placeHolderBookImage.cb3308a7.jpg";
+
 export const ItemCard = (
   {
     id,
@@ -32,14 +34,13 @@ export const ItemCard = (
   const [loading, setLoading] = React.useState(false);
 
   const [bookAdded, setBookAdded] = React.useState(false);
-
   return (
     <Container
       className="item_card"
       media={{
         content: (
           <img
-            src={imageUrl.length > 0 ? imageUrl : "https://images.unsplash.com/photo-1566041510639-8d95a2490bfb?q=80&w=3371&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+            src={imageUrl.length > 0 ? imageUrl : DEFAULT_BOOK_IMAGE_PATH}
             alt="book image"
           />
         ),
