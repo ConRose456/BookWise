@@ -8,7 +8,7 @@ import { RemoveOwnedBookModal } from "../owned_book_components/removeOwnedBookMo
 import { addOwnedBook } from "../../helpers/userAddOwnedBook";
 import { UserOwnsBookModal } from "../owned_book_components/userOwnsBookModal";
 
-const DEFAULT_BOOK_IMAGE_PATH = "/_next/static/media/placeHolderBookImage.cb3308a7.jpg";
+const DEFAULT_BOOK_IMAGE_PATH = "/assets/placeHolderBookImage.jpg";
 
 export const ItemCard = (
   {
