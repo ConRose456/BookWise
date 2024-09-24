@@ -25,7 +25,7 @@ export const OwnedBooks = () => {
         window.history.pushState(
             {},
             "",
-            `${window.location.origin}#/manage_users`,
+            `${window.location.origin}#/owned_books`,
         );
     });
 
