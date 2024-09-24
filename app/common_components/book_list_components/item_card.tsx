@@ -7,6 +7,7 @@ import Button from "@cloudscape-design/components/button";
 import { RemoveOwnedBookModal } from "../owned_book_components/removeOwnedBookModal";
 import { addOwnedBook } from "../../helpers/userAddOwnedBook";
 import { UserOwnsBookModal } from "../owned_book_components/userOwnsBookModal";
+import { ContributeBookModal } from "../contribute_components/bookContributionModal";
 
 const DEFAULT_BOOK_IMAGE_PATH = "/assets/placeHolderBookImage.jpg";
 
@@ -27,13 +28,14 @@ export const ItemCard = (
     userOwned?: boolean
   }
 ) => {
+  const [contributionModalVisible, setContributionModalVisible] = React.useState(false);
+
   const [removeModalVisible, setRemoveModalVisible] = React.useState(false);
   const [addModalVisible, setAddModalVisible] = React.useState(false);
   const [addModalMessage, setAddModalMessage] = React.useState("");
+  const [bookAdded, setBookAdded] = React.useState(false);
 
   const [loading, setLoading] = React.useState(false);
-
-  const [bookAdded, setBookAdded] = React.useState(false);
   return (
     <Container
       className="item_card"
@@ -49,11 +51,18 @@ export const ItemCard = (
       }}
       footer={
         <Box float="right">
+          <SpaceBetween direction="horizontal" size="s">
+          <Button 
+            variant="normal"
+            onClick={() => setContributionModalVisible(true)}
+          >
+            Edit
+          </Button>
           {!userOwned ?
             <Button
               loading={loading}
               disabled={bookAdded}
-              variant={bookAdded ? "primary" : "normal"}
+              variant={"primary"}
               onClick={async () => {
                 setLoading(true);
                 await addOwnedBook(id)
@@ -70,14 +79,27 @@ export const ItemCard = (
               }}
             >{bookAdded ? "Book Added" : "Add to Owned"}</Button>
             : <Button
+              variant="primary"
               onClick={async () => {
                 setRemoveModalVisible(true);
               }}
             >Remove Book</Button>
           }
+          </SpaceBetween>
         </Box>
       }
     >
+      <ContributeBookModal 
+        visible={contributionModalVisible} 
+        setVisible={setContributionModalVisible} 
+        isEdit={true}
+        editData={{
+          isbn: id,
+          title,
+          author,
+          description
+        }}
+      />
       <UserOwnsBookModal 
         visible={addModalVisible}
         setVisible={setAddModalVisible} 

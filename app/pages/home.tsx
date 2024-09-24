@@ -88,7 +88,7 @@ export const Home = () => {
                     type="search"
                     className='search_input'
                 />
-                <SearchDisplay searchQueryValue={searchQueryValue}/>
+                <SearchDisplay searchQueryValue={searchQueryValue} />
                 <BookItemListView searchQueryValue={searchQueryValue} defaultsSet={defaultsSet} fetchContentCallBack={fetchBooks} />
             </ContentLayout>
         </div>

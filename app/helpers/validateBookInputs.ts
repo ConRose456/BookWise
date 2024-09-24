@@ -32,6 +32,9 @@ const fieldsEmpty = (fields: Map<string, string | undefined>): string[] => {
 
 export const validateImage = async (image: File | undefined, setFileError: (value: string[]) => void) => {
     const maxFileSize = 50 * 1024 * 1024; // 50 MB in bytes
+    if (!image) {
+        return;
+    }
 
     // Check if the file is an image
     if (!image?.type.startsWith('image/')) {
@@ -58,6 +61,4 @@ export const validateImage = async (image: File | undefined, setFileError: (valu
         return;
       }
     };
-
-    setFileError([]);
   };

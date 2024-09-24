@@ -14,9 +14,10 @@ import { InternalItemOrGroup } from '@cloudscape-design/components/button-dropdo
 import { useEffect } from 'react';
 import { SignUpContext } from './controllers/SignUpController';
 import dynamic from 'next/dynamic';
-import { HashRouter, useNavigate } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 const PageRouterComponent = dynamic(() => import('./pageRouter'), { ssr: false })
+
 
 export default function PageLayout() {
     const { userDisplayTextUseState, authTokenStateController } = useContext(AuthTokenStateContext);

@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, ContentLayout, Header, SpaceBetween, StatusIndicator, Table, TextFilter } from "@cloudscape-design/components";
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 import { DeleteUserModal } from "../common_components/manage_users_component/deleteUserModal";

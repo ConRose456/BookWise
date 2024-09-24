@@ -1,24 +1,27 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, FileUpload, FormField, Header, Input, Modal, SpaceBetween, Textarea } from "@cloudscape-design/components";
-import { contributeBook } from "@/app/helpers/contributeBookForm";
+import { contributeBook, editBook } from "@/app/helpers/contributeBookForm";
 import { validateBookInputs, validateImage } from "@/app/helpers/validateBookInputs";
 import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
 import { SignUpContext } from "@/app/controllers/SignUpController";
 import { ErrorContributeBookModal } from "./contributeErrorModal";
 
-const imageErrorMessages = {
-    not_image: "This file is not an image.",
-    image_size: "Image is larger that 50MB.",
-    image_aspect: "Image aspect ratio must be beteen 0.6:1 and 0.7:1."
-}
-
 export const ContributeBookModal = (
     {
         visible,
         setVisible,
+        isEdit,
+        editData
     }: {
         visible: boolean,
-        setVisible: (value: boolean) => void
+        setVisible: (value: boolean) => void,
+        isEdit?: boolean
+        editData?: {
+            isbn: string,
+            title: string,
+            author: string,
+            description: string
+        }
     }
 ) => {
     const { setShouldSignUp } = useContext(SignUpContext);
@@ -37,6 +40,15 @@ export const ContributeBookModal = (
     const [validInputs, setValidInputs] = useState<string[]>([]);
     const [fileErrors, setFileError] = useState<string[]>([])
 
+    useEffect(() => {
+        if (isEdit) {
+            setIsbn(editData?.isbn ?? "");
+            setTitle(editData?.title ?? "");
+            setAuthor(editData?.author ?? "");
+            setDescription(editData?.description ?? "");
+        }
+    }, []);
+
     // Ensure user is Authed
     useEffect(() => {
         if (visible) {
@@ -45,19 +57,28 @@ export const ContributeBookModal = (
                 setShouldSignUp(true);
             }
         }
+        if (!isEdit) {
+            setIsbn("");
+            setTitle("");
+            setAuthor("");
+            setDescription("");
+            setValidInputs([]);
+        }
     }, [visible]);
 
     useEffect(() => {
         validateImage(imageFile, setFileError)
     }, [imageFile]);
 
-    useEffect(() => {
-        setIsbn("");
-        setTitle("");
-        setAuthor("");
-        setDescription("");
-        setValidInputs([]);
-    }, [visible]);
+    const onReponse = (response: any) => {
+        if (response.success) {
+            window.location.reload();
+            setVisible(false);
+        } else {
+            setErrorMessage(response.message ?? "Uknown error");
+            setErrorModalVisible(true);
+        }
+    }
 
     return (
         <div>
@@ -66,7 +87,7 @@ export const ContributeBookModal = (
                 onDismiss={() => setVisible(false)}
                 header={
                     <Header>
-                        Contribute a Book
+                        {isEdit ? "Edit your book" : "Contribute a Book"}
                     </Header>
                 }
                 footer={
@@ -78,28 +99,22 @@ export const ContributeBookModal = (
                                 variant="primary"
                                 onClick={async() => {
                                     setLoading(true);
-                                    setValidInputs(validateBookInputs({
+
+                                    const bookData = {
                                         isbn,
                                         title,
                                         author,
-                                        description
-                                    }));
+                                        description,
+                                        image: imageFile
+                                    }
+
+                                    setValidInputs(validateBookInputs(bookData));
                                     if (validInputs?.length === 0 && fileErrors?.length === 0) {
-                                        await contributeBook({
-                                            isbn,
-                                            title,
-                                            author,
-                                            description,
-                                            image: imageFile
-                                        }).then(response => {
-                                            if (response.success) {
-                                                window.location.reload();
-                                                setVisible(false);
-                                            } else {
-                                                setErrorMessage(response.message ?? "Uknown error");
-                                                setErrorModalVisible(true);
-                                            }
-                                        });
+                                        if (isEdit) {
+                                            await editBook(bookData).then(response => onReponse(response));
+                                        } else {
+                                            await contributeBook(bookData).then(response => onReponse(response));
+                                        }
                                     }
                                     setLoading(false);
                                 }}
@@ -124,6 +139,7 @@ export const ContributeBookModal = (
                         <Input
                             placeholder="Enter ISBN"
                             value={isbn}
+                            disabled={isEdit}
                             onChange={({ detail }) => setIsbn(detail.value.replace(" ", ""))}
                         />
                     </FormField>
@@ -162,7 +178,7 @@ export const ContributeBookModal = (
                     </FormField>
 
                     <FormField
-                        label="Book Cover Image"
+                        label={`Book Cover Image ${isEdit ? " - The image won't change if you don't upload a new one." : ""}`}
                         description="Upload a photo of the books cover."
                     >
                         <FileUpload
@@ -185,7 +201,7 @@ export const ContributeBookModal = (
                             showFileSize
                             showFileThumbnail
                             tokenLimit={1}
-                            constraintText="Hint text for file requirements"
+                            constraintText="Max file size 50MB"
                         />
                     </FormField>
                 </SpaceBetween>
