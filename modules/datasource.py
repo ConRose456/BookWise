@@ -4,7 +4,9 @@ from sqlalchemy.orm import relationship, sessionmaker
 import os
 
 Base = declarative_base()
+# database table definitions
 
+# User table
 class User(Base):
     __tablename__ = 'users'
     
@@ -18,6 +20,7 @@ class User(Base):
     
     owned_books = relationship('OwnedBook', back_populates='user')
 
+# Book Table
 class Book(Base):
     __tablename__ = 'books'
     
@@ -29,6 +32,7 @@ class Book(Base):
 
     image_url = Column(String)
 
+    # function to format book data to dictonary
     def to_dict(self):
         return {
             'isbn': self.isbn,
@@ -38,6 +42,7 @@ class Book(Base):
             'image_url': self.image_url,
         }
 
+# Owned Book table
 class OwnedBook(Base):
     __tablename__ = 'owned_books'
     

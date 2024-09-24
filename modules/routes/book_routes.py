@@ -15,6 +15,7 @@ SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# function getting offset and page size for pafinated book request
 def paginateBooks(request):
     try:
         page = int(request.args.get('page', 1))
@@ -29,6 +30,7 @@ def paginateBooks(request):
 
     return offset, page_size
 
+# Get endpoint to get a books in book table
 @book_bp.route("/api/all_books", methods=["GET"])
 def getAllBooks():
     session = datasource.initDatasource()
@@ -37,6 +39,7 @@ def getAllBooks():
 
     offset, page_size = paginateBooks(request)
 
+    # filtering by search query
     books_query = session.query(datasource.Book).filter(
         or_(
             datasource.Book.title.ilike(f"%{search_query}%"),
@@ -44,6 +47,7 @@ def getAllBooks():
         )
     )
     
+    # getting correct page of paginated books
     books = books_query.offset(offset).limit(page_size).all()
     total_books = books_query.count()
 
@@ -61,6 +65,7 @@ def getAllBooks():
         'pagination': json.dumps(pagination)
     })
 
+# Get endpoint fro getting all owned books
 @book_bp.route("/api/user_books", methods=["GET"])
 @token_required
 def getUserBooks(current_user, session, isAuthed):
@@ -75,6 +80,7 @@ def getUserBooks(current_user, session, isAuthed):
         datasource.OwnedBook.removed == False 
     ).all()
 
+    # filtering by search query
     books_query = session.query(
         datasource.Book
     ).filter(
@@ -85,6 +91,7 @@ def getUserBooks(current_user, session, isAuthed):
         )
     )
 
+    # getting correct page of paginated books
     books = books_query.offset(offset).limit(page_size).all()
     total_books = books_query.count()
 
@@ -103,6 +110,7 @@ def getUserBooks(current_user, session, isAuthed):
         'isAuthed': True
     })
 
+# Api endpoint to contribute book / add new book to book table
 @book_bp.route("/api/contribute_book", methods=["POST"])
 @token_required
 def contribute_book(current_user, session, isAuthed):
@@ -152,6 +160,7 @@ def contribute_book(current_user, session, isAuthed):
         session.close()
         return {"success": True, "message": "Book added successfully."}
 
+# Api endpoint to add user owned book
 @book_bp.route("/api/add_owned_book", methods=["POST"])
 @token_required
 def add_owned_book(current_user, session, isAuthed):
@@ -187,6 +196,7 @@ def add_owned_book(current_user, session, isAuthed):
         session.close()
 
 
+# Api endpoint for removing user book 
 @book_bp.route("/api/remove_user_book", methods=["POST"])
 @token_required
 def remove_user_book(current_user, session, isAuthed):
@@ -199,6 +209,7 @@ def remove_user_book(current_user, session, isAuthed):
         if not owned_book:
             return jsonify({'isAuthed': isAuthed, 'success': False})
     
+        # setting record as removed not deleted so record can be retieved
         owned_book.removed = True
         session.commit()
     except Exception as e:

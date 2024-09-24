@@ -5,6 +5,7 @@ import modules.datasource as datasource
 
 user_management_bp = Blueprint('user_management', __name__)
 
+# endpoint to check if user is an admin
 @user_management_bp.route('/api/is_admin', methods=["GET"])
 @token_required
 def getAdminAuthed(current_user, session, isAuthed):
@@ -15,7 +16,7 @@ def getAdminAuthed(current_user, session, isAuthed):
         }), 403
     return jsonify({'isAuthed': True }), 200
 
-
+#  endpoint to get all users for user management
 @user_management_bp.route('/api/users', methods=["GET"])
 @token_required
 def getAllUsers(current_user, session, isAuthed):
@@ -43,6 +44,7 @@ def getAllUsers(current_user, session, isAuthed):
     finally:
         session.close()
 
+# endpoint to delete users from user table
 @user_management_bp.route('/api/delete_user', methods=["POST"])
 @token_required
 def deleteUser(current_user, session, isAuthed):

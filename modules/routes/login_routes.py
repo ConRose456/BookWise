@@ -11,15 +11,18 @@ login_bp = Blueprint('login', __name__)
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+# function to hash password before storing
 def hash_password(password):
     password_bytes = password.encode('utf-8')
     return bcrypt.hashpw(password_bytes, bcrypt.gensalt())
 
+# function to check entered password against stored hashed password
 def check_hashed_password(stored_hash_hex, password):
     password_bytes = password.encode('utf-8')
     stored_hash_bytes = bytes.fromhex(stored_hash_hex.replace("\\x", ""))
     return bcrypt.checkpw(password_bytes, stored_hash_bytes)
 
+# function to login user / retrive JWT
 def login_user(username, password, session):
     user = session.query(datasource.User).filter_by(username=username).first()
 
@@ -34,6 +37,7 @@ def login_user(username, password, session):
     
     return jsonify({'userText': "", 'token': "", 'errors': 'login_failed'})
 
+# checking if user name exists endpoint for input validation
 @login_bp.route("/api/check_username_exists", methods=["POST"])
 def check_username_exists():
     session = datasource.initDatasource()
@@ -44,7 +48,7 @@ def check_username_exists():
         return jsonify({'exists': True})
     return jsonify({'exists': False})
 
-
+# sign up endpoint
 @login_bp.route("/api/sign_up", methods=["POST"])
 def sign_up():
     session = datasource.initDatasource()
@@ -64,6 +68,7 @@ def sign_up():
     session.close()
     return result
 
+# login endpoint
 @login_bp.route("/api/login", methods=['POST'])
 def login():
     session = datasource.initDatasource()
