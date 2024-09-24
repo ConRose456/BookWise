@@ -158,7 +158,9 @@ def edit_book(current_user, session, isAuthed):
     existing_book.title=request.form.get("title"),
     existing_book.author=request.form.get("author"),
     existing_book.description=request.form.get("description"),
-    existing_book.image_url=public_url
+    if (len(public_url) > 0):
+        existing_book.image_url=public_url
+    
 
     try:
         session.add(existing_book)
