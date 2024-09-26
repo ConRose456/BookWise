@@ -51,12 +51,6 @@ export const ContributeBookModal = (
 
     // Ensure user is Authed
     useEffect(() => {
-        if (visible) {
-            if (!AuthTokenStateController.isAuthorized()) {
-                setVisible(false);
-                setShouldSignUp(true);
-            }
-        }
         if (!isEdit) {
             setIsbn("");
             setTitle("");

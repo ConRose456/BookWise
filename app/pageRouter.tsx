@@ -3,7 +3,7 @@ import { Home } from "./pages/home";
 import { OwnedBooks } from "./pages/ownedBooks";
 import { Route, Routes } from "react-router-dom";
 import ManageUsers from "./pages/manageUsers";
-import { withAdminAuth } from "./helpers/withAdminAuth";
+import { withAdminAuth } from "./helpers/auth";
 
 const ProtectedManageUserPage = withAdminAuth(ManageUsers);
 

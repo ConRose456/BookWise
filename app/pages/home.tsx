@@ -1,14 +1,17 @@
 import { Box, Button, ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-design/components";
-import React from "react";
+import React, { useContext } from "react";
 import { BookItemListView, getDefaultSearchValue } from "../common_components/book_list_components/bookItemListView";
 import { useState } from "react";
 import { useEffect } from "react";
 import { ContributeBookModal } from "../common_components/contribute_components/bookContributionModal";
 import { SearchDisplay } from "../common_components/searchDisplayComponent";
+import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
+import { SignUpContext } from "../controllers/SignUpController";
 
 const PAGE_MAX_SIZE = 21;
 
 export const Home = () => {
+    const {setShouldSignUp} = useContext(SignUpContext);
     const [defaultsSet, setDefaultsSet] = useState(false);
 
     const [searchInputValue, setSearchInputValue] = useState("");
@@ -64,7 +67,11 @@ export const Home = () => {
                             <Button
                                 variant="primary"
                                 onClick={() => {
-                                    setContributionModalVisible(true)
+                                    if (AuthTokenStateController.isAuthorized()) {
+                                        setContributionModalVisible(true);
+                                      } else {
+                                        setShouldSignUp(true);
+                                      }
                                 }}
                             >
                                 Contribute Book

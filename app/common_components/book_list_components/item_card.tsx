@@ -57,7 +57,13 @@ export const ItemCard = (
           <SpaceBetween direction="horizontal" size="s">
           <Button 
             variant="normal"
-            onClick={() => setContributionModalVisible(true)}
+            onClick={() => {
+              if (AuthTokenStateController.isAuthorized()) {
+                setContributionModalVisible(true);
+              } else {
+                setShouldSignUp(true);
+              }
+            }}
           >
             Edit
           </Button>
