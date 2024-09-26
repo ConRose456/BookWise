@@ -8,6 +8,8 @@ import { RemoveOwnedBookModal } from "../owned_book_components/removeOwnedBookMo
 import { addOwnedBook } from "../../helpers/userAddOwnedBook";
 import { UserOwnsBookModal } from "../owned_book_components/userOwnsBookModal";
 import { ContributeBookModal } from "../contribute_components/bookContributionModal";
+import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
+import { SignUpContext } from "@/app/controllers/SignUpController";
 
 const DEFAULT_BOOK_IMAGE_PATH = "/assets/placeHolderBookImage.jpg";
 
@@ -28,6 +30,7 @@ export const ItemCard = (
     userOwned?: boolean
   }
 ) => {
+  const {setShouldSignUp} = React.useContext(SignUpContext);
   const [contributionModalVisible, setContributionModalVisible] = React.useState(false);
 
   const [removeModalVisible, setRemoveModalVisible] = React.useState(false);
@@ -65,7 +68,8 @@ export const ItemCard = (
               variant={"primary"}
               onClick={async () => {
                 setLoading(true);
-                await addOwnedBook(id)
+                if (AuthTokenStateController.isAuthorized()) {
+                  await addOwnedBook(id)
                   .then(response => {
                     if (response.success) {
                       setBookAdded(true);
@@ -75,7 +79,10 @@ export const ItemCard = (
                     }
                   })
                   .catch(error => console.error(error));
-                  setLoading(false);
+                } else {
+                  setShouldSignUp(true);
+                }
+                setLoading(false);
               }}
             >{bookAdded ? "Book Added" : "Add to Owned"}</Button>
             : <Button
