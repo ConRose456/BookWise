@@ -1,4 +1,4 @@
-import { Box, Button, Modal, SpaceBetween } from "@cloudscape-design/components";
+import { Box, Button, Header, Modal, SpaceBetween } from "@cloudscape-design/components";
 import { removeOwnedBook } from "../../helpers/userRemoveOwnedBook";
 import React, { useState } from "react";
 
@@ -28,6 +28,7 @@ export const RemoveOwnedBookModal = (
                 onDismiss={() => {
                     setVisible(false);
                 }}
+                header={<Header>BookWise</Header>}
                 footer={
                     <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
@@ -55,7 +56,7 @@ export const RemoveOwnedBookModal = (
                 </Box>
                 }    
             >
-                {failed ? "Failed to remove book from owned books." : `Are you sure you want to remove ${title}.`}
+                {failed ? "Failed to remove book from owned books." : `Are you sure you want to remove ${title}?`}
             </Modal>
         </div>
     );
