@@ -1,8 +1,8 @@
-import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
+import { submitLoginRequest } from "./login";
 
 export const submitSignUpForm = async (
-    {firstName, secondName, username, password, confirmPassword }
-    : {firstName: string, secondName: string, username: string, password: string, confirmPassword: string},
+    { firstName, secondName, username, password, confirmPassword }
+        : { firstName: string, secondName: string, username: string, password: string, confirmPassword: string },
     setUserText: (value: any) => any,
     setVisible: (value: boolean) => any,
     setInvalidInputs: (value: any[] | undefined) => any,
@@ -31,36 +31,22 @@ export const submitSignUpForm = async (
     const isUsernameValid = validateUsername(username) && !usernameExist;
     const isPasswordValid = validatePassword(password) && isPasswordEqual(password, confirmPassword);
 
-    if (isUsernameValid && isPasswordValid ) {
-        const { userText, token, errors } = await fetch("/api/sign_up", {
-            method: 'POST',
-            headers: {
-                "Content-Type": 'application/json',
-                "charset": 'UTF-8'
-            },
-            body: JSON.stringify({
-                username: username,
+    if (isUsernameValid && isPasswordValid) {
+        return await submitLoginRequest(
+            "/api/sign_up",
+            {
+                username,
                 password,
                 first_name: firstName,
-                second_name: secondName,
-            }),
-        })
-            .then(response => response.json())
-            .catch((error) => console.log(error));
-        
-        if (!errors) {
-            AuthTokenStateController.setAuthToken(token);
-            setUserText(userText);
-            setAuthed(true);
-            setVisible(false);
-            return { completed: true };
-        } else {
-            console.error(errors);
-            return { completed: false };
-        }
+                second_name: secondName
+            }, {
+            setAuthed,
+            setUserText,
+            setVisible
+        });
     } else {
         setInvalidInputs(invalidInputs);
-        return  {completed : false};
+        return { completed: false };
     }
 }
 
@@ -80,7 +66,7 @@ const usernameExists = async (username: string) => {
         },
         body: JSON.stringify({ username: username })
     }).then(reponse => reponse.json())
-    .catch(error => console.log(error));
+        .catch(error => console.log(error));
 
     return exists;
 }

@@ -57,7 +57,7 @@ export const validateImage = async (image: File | undefined, setFileError: (valu
 
       // Check if the aspect ratio matches the expected one
       if (aspectRatio > 0.67 || aspectRatio < 0.64) {
-        setFileError(["Image aspect ratio must be beteen 0.6:1 and 0.7:1."])
+        setFileError(["Image aspect ratio must be beteen 0.64:1 and 0.67:1."])
         return;
       }
     };

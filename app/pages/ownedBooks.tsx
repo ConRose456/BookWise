@@ -7,8 +7,7 @@ import { ContentLayout, Header, Input, Link, SpaceBetween } from "@cloudscape-de
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 import { SignUpContext } from "../controllers/SignUpController";
 import { SearchDisplay } from "../common_components/searchDisplayComponent";
-
-const PAGE_MAX_SIZE = 21;
+import { getOwnedBooks } from "../apiRequests/books/getOwnedBooks";
 
 const PAGE_URL = "#/owned_books";
 
@@ -40,33 +39,15 @@ export const OwnedBooks = () => {
         setPageCount: (value: number) => void,
         currentPage: number,
     ) => {
-        setItems([]);
-        const page = currentPage > 0 ? currentPage : 1;
-        await fetch(
-            `/api/user_books?page=${page}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
+       await getOwnedBooks(
+            searchQueryValue,
             {
-                method: "GET",
-                headers: {
-                    "Content-Type": 'application/json',
-                    "charset": 'UTF-8',
-                    "Authorization": `Bearer ${AuthTokenStateController.getAuthToken()}`
-                }
+                setItems,
+                setPageCount,
+                currentPage,
+                setShouldSignUp
             }
-        )
-            .then(response => response.json())
-            .then(({ books = JSON.stringify([]), pagination = JSON.stringify(""), isAuthed, error }) => {
-                if (isAuthed) {
-                    const paginationData = JSON.parse(pagination) ?? {};
-                    const bookData = JSON.parse(books) ?? []
-                    setItems(bookData);
-                    setPageCount(paginationData.total_pages ?? 1);
-                } else if (error) {
-                    console.error(error)
-                } else {
-                    setShouldSignUp(true);
-                }
-            })
-            .catch(error => console.log(error));
+       );
     }
 
     return (

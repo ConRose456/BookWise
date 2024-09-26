@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, FileUpload, FormField, Header, Input, Modal, SpaceBetween, Textarea } from "@cloudscape-design/components";
-import { contributeBook, editBook } from "@/app/helpers/contributeBookForm";
 import { validateBookInputs, validateImage } from "@/app/helpers/validateBookInputs";
-import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
 import { SignUpContext } from "@/app/controllers/SignUpController";
 import { ErrorContributeBookModal } from "./contributeErrorModal";
+import { editBook } from "@/app/apiRequests/books/editBook";
+import { contributeBook } from "@/app/apiRequests/books/contributeBook";
 
 export const ContributeBookModal = (
     {
@@ -24,8 +24,6 @@ export const ContributeBookModal = (
         }
     }
 ) => {
-    const { setShouldSignUp } = useContext(SignUpContext);
-
     const [errorModalVisible, setErrorModalVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -68,6 +66,8 @@ export const ContributeBookModal = (
         if (response.success) {
             window.location.reload();
             setVisible(false);
+        } else if (response.inValidInputs) {
+            setLoading(false);
         } else {
             setErrorMessage(response.message ?? "Uknown error");
             setErrorModalVisible(true);
@@ -103,12 +103,10 @@ export const ContributeBookModal = (
                                     }
 
                                     setValidInputs(validateBookInputs(bookData));
-                                    if (validInputs?.length === 0 && fileErrors?.length === 0) {
-                                        if (isEdit) {
-                                            await editBook(bookData).then(response => onReponse(response));
-                                        } else {
-                                            await contributeBook(bookData).then(response => onReponse(response));
-                                        }
+                                    if (isEdit) {
+                                        await editBook(bookData).then(response => onReponse(response));
+                                    } else {
+                                        await contributeBook(bookData).then(response => onReponse(response));
                                     }
                                     setLoading(false);
                                 }}

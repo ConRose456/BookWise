@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Box, Button, Header, Modal, SpaceBetween } from "@cloudscape-design/components";
 import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
+import { deleteUser } from "@/app/apiRequests/userManagement/deleteUser";
 
 export const DeleteUserModal = (
     {
@@ -18,29 +19,7 @@ export const DeleteUserModal = (
 
     const handleDelete = async () => {
         setLoading(true)
-        await fetch(
-            "/api/delete_user",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": 'application/json',
-                    "charset": 'UTF-8',
-                    "Authorization": `Bearer ${AuthTokenStateController.getAuthToken()}`
-                },
-                body: JSON.stringify({ username })
-            }
-        ).then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(`Failed to Delete ${username}`);
-                    console.log("Delete Failed");
-                }
-                setVisible(false);
-            })
-            .catch(error => console.error(error))
-            .finally(() => setLoading(false));
+        await deleteUser(username, setVisible).finally(() => setLoading(false));
     }
     return (
         <Modal

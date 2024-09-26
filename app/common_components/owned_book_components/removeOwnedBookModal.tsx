@@ -1,6 +1,6 @@
 import { Box, Button, Header, Modal, SpaceBetween } from "@cloudscape-design/components";
-import { removeOwnedBook } from "../../helpers/userRemoveOwnedBook";
 import React, { useState } from "react";
+import { manageOwnedBook } from "@/app/apiRequests/books/manageOwnedBook";
 
 export const RemoveOwnedBookModal = (
     {
@@ -40,7 +40,7 @@ export const RemoveOwnedBookModal = (
                             onClick={async () => {
                                 if (!failed) {
                                     setLoading(true);
-                                    const response = await removeOwnedBook(id);
+                                    const response = await manageOwnedBook(id, "/api/remove_user_book");
                                     console.log(response)
                                     if (!response.success) {
                                         setFailed(true);

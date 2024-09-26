@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from modules.auth import token_required
+from modules.utils.auth import token_required
 
 import modules.datasource as datasource
 

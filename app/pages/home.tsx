@@ -7,8 +7,7 @@ import { ContributeBookModal } from "../common_components/contribute_components/
 import { SearchDisplay } from "../common_components/searchDisplayComponent";
 import { AuthTokenStateController } from "../controllers/AuthTokenStateController";
 import { SignUpContext } from "../controllers/SignUpController";
-
-const PAGE_MAX_SIZE = 21;
+import { getAllBooks } from "../apiRequests/books/getAllBooks";
 
 export const Home = () => {
     const {setShouldSignUp} = useContext(SignUpContext);
@@ -30,26 +29,14 @@ export const Home = () => {
         setPageCount: (value: number) => void,
         currentPage: number,
     ) => {
-        setItems([]);
-        const page = currentPage > 0 ? currentPage : 1;
-
-        await fetch(
-            `/api/all_books?page=${page}&page_size=${PAGE_MAX_SIZE}&query=${searchQueryValue}`,
+        await getAllBooks(
+            searchQueryValue,
             {
-                method: "GET",
-                headers: {
-                    "Content-Type": 'application/json',
-                    "charset": 'UTF-8'
-                }
+                setItems,
+                setPageCount,
+                currentPage
             }
-        )
-            .then(response => response.json())
-            .then(({ books, pagination }) => {
-                const parsedPagination = pagination ?? undefined;
-                setItems(JSON.parse(books));
-                setPageCount(JSON.parse(parsedPagination)?.total_pages ?? 1);
-            })
-            .catch(error => console.log(error));
+        );
     }
 
     return (

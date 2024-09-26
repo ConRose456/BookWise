@@ -5,11 +5,11 @@ import Box from "@cloudscape-design/components/box";
 import Link from "@cloudscape-design/components/link";
 import Button from "@cloudscape-design/components/button";
 import { RemoveOwnedBookModal } from "../owned_book_components/removeOwnedBookModal";
-import { addOwnedBook } from "../../helpers/userAddOwnedBook";
 import { UserOwnsBookModal } from "../owned_book_components/userOwnsBookModal";
 import { ContributeBookModal } from "../contribute_components/bookContributionModal";
 import { AuthTokenStateController } from "@/app/controllers/AuthTokenStateController";
 import { SignUpContext } from "@/app/controllers/SignUpController";
+import { manageOwnedBook } from "@/app/apiRequests/books/manageOwnedBook";
 
 const DEFAULT_BOOK_IMAGE_PATH = "/assets/placeHolderBookImage.jpg";
 
@@ -75,7 +75,7 @@ export const ItemCard = (
               onClick={async () => {
                 setLoading(true);
                 if (AuthTokenStateController.isAuthorized()) {
-                  await addOwnedBook(id)
+                  await manageOwnedBook(id, "/api/add_owned_book")
                   .then(response => {
                     if (response.success) {
                       setBookAdded(true);

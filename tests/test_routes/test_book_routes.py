@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from modules.datasource import Book, OwnedBook
-from modules.auth import token_required
+from modules.utils.auth import token_required
 import json
 
 mock_user = MagicMock(username="testuser")

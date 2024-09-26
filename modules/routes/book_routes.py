@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import or_
-from modules.auth import token_required
+from modules.utils.auth import token_required
 from modules.utils.images import upload_image
 import modules.datasource as datasource
 import json
