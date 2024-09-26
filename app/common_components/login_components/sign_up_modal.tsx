@@ -140,14 +140,14 @@ export const SignUpModal = (
                 </FormField>
                 <FormField
                     label="Username"
-                    description="This username will be used when you log in to your new account"
+                    description="This username will be used when you log in to your new account."
                     errorText={getUsernameErrorText()}
                 >
                     <Input value={enteredUsername} onChange={({ detail }) => setEnteredUsername(detail.value)} placeholder="username" />
                 </FormField>
                 <FormField
                     label="Password"
-                    description="Enter your password"
+                    description="Enter a password it must contain one digit 0-9 and a special character."
                     errorText={invalidInputs?.includes("password_invalid") ? "Your password must meet the requirements bellow." : ""}
                 >
                     <Input type="password" value={password} onChange={({ detail }) => setPassword(detail.value)} placeholder="password" />

@@ -99,7 +99,7 @@ export const LoginModal = (
                 </FormField>
                 <FormField
                     label="Password"
-                    description="Enter your password."
+                    description="Enter your password"
                     errorText={invalidInputs ? "Incorrect Username or Password." : ""}
                 >
                     <Input type="password" value={enteredPassword} onChange={({ detail }) => setEnteredPassword(detail.value)} placeholder="password" />
