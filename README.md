@@ -11,7 +11,11 @@ npx create-next-app book-wise --example "https://github.com/ConRose456/BookWise/
 ```
 
 ## Getting Started
-
+Admin Credentials
+```
+username: admin
+password: admin1
+```
 First, install the dependencies:
 ```
 pnpm install
